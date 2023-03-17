@@ -1,0 +1,22 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.mainFxmlClass {
+    -fx-background-image: url("https://anhdepfree.com/wp-content/uploads/2022/11/background-2d-dep-cho-photoshop_63710488652.jpg");
+    -fx-background-repeat: stretch;   
+    -fx-background-size: 900 506;
+    -fx-background-position: center center;
+    -fx-effect: dropshadow(three-pass-box, black, 30, 0.5, 0, 0); 
+}
+.label{
+    -fx-text-fill: #ffff;
+    -fx-effect: dropshadow(three-pass-box, black, 30, 0.5, 0, 0); 
+}
+.text-field, .password-field{
+    -fx-effect: dropshadow(three-pass-box, black, 10, 0.05, 0, 0);
+}
+.button{
+    -fx-background-color: darkslateblue; 
+    -fx-text-fill: white;
+}

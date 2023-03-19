@@ -16,7 +16,7 @@
    <children>
       <Pane prefHeight="70.0" prefWidth="607.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label layoutX="204.0" layoutY="35.0" text="Đăng Nhập Hệ Thống" textAlignment="CENTER" textFill="#1b1b1b">
+            <Label layoutX="204.0" layoutY="35.0" text="Đăng Nhập Vào Game" textAlignment="CENTER" textFill="#1b1b1b">
                <font>
                   <Font name="Tahoma" size="20.0" />
                </font>

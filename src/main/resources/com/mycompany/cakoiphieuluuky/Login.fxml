@@ -11,22 +11,22 @@
 
 <AnchorPane id="AnchorPane" prefHeight="293.0" prefWidth="601.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.cakoiphieuluuky.LoginController">
     <stylesheets>
-        <URL value="@/styles/login.css" />
+        <URL value="@../../../styles/login.css" />
     </stylesheets>
-   <children>
-      <Pane prefHeight="70.0" prefWidth="607.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <children>
-            <Label layoutX="204.0" layoutY="35.0" text="Đăng Nhập Vào Game" textAlignment="CENTER" textFill="#1b1b1b">
-               <font>
-                  <Font name="Tahoma" size="20.0" />
-               </font>
-            </Label>
-         </children>
-      </Pane>
-      <Button id="loginBtn" layoutX="245.0" layoutY="228.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" text="ĐĂNG NHẬP" />
-      <Label layoutX="149.0" layoutY="111.0" text="Tên đăng nhập" />
-      <Label layoutX="149.0" layoutY="164.0" text="Mật khẩu" />
-      <TextField id="txtName" layoutX="278.0" layoutY="107.0" prefHeight="26.0" prefWidth="202.0" />
-      <PasswordField id="txtPass" layoutX="278.0" layoutY="160.0" prefHeight="26.0" prefWidth="202.0" />
-   </children>
+    <children>
+        <Pane prefHeight="70.0" prefWidth="607.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <Label layoutX="204.0" layoutY="35.0" text="Đăng Nhập Vào Game" textAlignment="CENTER" textFill="#1b1b1b">
+                    <font>
+                        <Font name="Tahoma" size="20.0" />
+                    </font>
+                </Label>
+            </children>
+        </Pane>
+        <Button id="loginBtn" layoutX="245.0" layoutY="228.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="112.0" text="ĐĂNG NHẬP" />
+        <Label layoutX="149.0" layoutY="111.0" text="Tên đăng nhập" />
+        <Label layoutX="149.0" layoutY="164.0" text="Mật khẩu" />
+        <TextField id="txtName" layoutX="278.0" layoutY="107.0" prefHeight="26.0" prefWidth="202.0" />
+        <PasswordField id="txtPass" layoutX="278.0" layoutY="160.0" prefHeight="26.0" prefWidth="202.0" />
+    </children>
 </AnchorPane>

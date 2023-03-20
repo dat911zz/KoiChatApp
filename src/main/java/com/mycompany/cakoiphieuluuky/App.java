@@ -23,7 +23,7 @@ public class App extends Application {
         //Khởi tạo fxml Login và setup stage
         scene = new Scene(loadFXML("Login"), 640, 400);
         stage.setScene(scene);
-        stage.setTitle("Cá Koi Phiêu Lưu Ký");
+        stage.setTitle("Cá Koi Phiêu Săn Quái Thú");
         stage.show();
         //Gọi các thành phần view
         TextField txtName = (TextField) scene.lookup("#txtName");

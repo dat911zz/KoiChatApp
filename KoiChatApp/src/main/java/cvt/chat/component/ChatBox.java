@@ -43,7 +43,7 @@ public class ChatBox extends JComponent {
         text.setEditorKit(new AutoWrapText());
         text.setText(message.getMessage());
         text.setBackground(new Color(0, 0, 0, 0));
-        text.setForeground(new Color(242, 242, 242));
+        text.setForeground(new Color(0, 0, 0));
         text.setSelectionColor(new Color(200, 200, 200, 100));
         text.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         text.setOpaque(false);
@@ -64,12 +64,12 @@ public class ChatBox extends JComponent {
         if (boxType == BoxType.LEFT) {
             Area area = new Area(new RoundRectangle2D.Double(25, 25, width - 25, height - 25 - 16 - 10, 5, 5));
             area.subtract(new Area(new Ellipse2D.Double(5, 5, 45, 45)));
-            g2.setPaint(new GradientPaint(0, 0, new Color(255, 94, 98, 240), width, 0, new Color(255, 153, 102, 240)));
+            g2.setPaint(new GradientPaint(0, 0, new Color(255, 255, 255, 240), width, 0, new Color(255, 255, 240, 240)));
             g2.fill(area);
         } else {
             Area area = new Area(new RoundRectangle2D.Double(0, 25, width - 25, height - 25 - 16 - 10, 5, 5));
             area.subtract(new Area(new Ellipse2D.Double(width - 50, 5, 45, 45)));
-            g2.setColor(new Color(255, 255, 255, 20));
+            g2.setColor(new Color(230, 255, 253));
             g2.fill(area);
         }
         g2.dispose();

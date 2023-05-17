@@ -32,6 +32,12 @@ import net.miginfocom.swing.MigLayout;
 import cvt.chat.swing.ChatEvent;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 public class ChatArea extends JPanel {
 
@@ -94,13 +100,32 @@ public class ChatArea extends JPanel {
 
     private JPanel createHeader() {
         RoundPanel panel = new RoundPanel();
-        panel.setLayout(new MigLayout("fill, inset 2", "", "[34!]"));
+        GoogleMaterialIcon iconExit = new GoogleMaterialIcon(GoogleMaterialDesignIcon.CLOSE, GradientType.VERTICAL, new Color(210, 210, 210), new Color(255, 255, 255), 20);
+        Button cmdExit = new Button();
+        cmdExit.setFocusable(false);
+        cmdExit.setIcon(iconExit.toIcon());
+        panel.setLayout(new MigLayout("fill, inset 2", "[fill][fill,34!]", "[34!]"));
         panel.setBackground(new Color(255, 255, 255, 20));
         labelTitle = new JLabel();
         labelTitle.setFont(labelTitle.getFont().deriveFont(14f));
         labelTitle.setBorder(new EmptyBorder(2, 10, 2, 2));
         labelTitle.setForeground(new Color(240, 240, 240));
+        
+        
+        cmdExit.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                int choose = JOptionPane.showConfirmDialog(getComponent(WIDTH), "Bạn có chắc chắn thoát?", "Thông báo", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                if(choose == JOptionPane.YES_OPTION) {
+                    System.exit(0);
+                }
+            }
+            
+        });
+        
         panel.add(labelTitle);
+        panel.add(cmdExit);
         return panel;
     }
 

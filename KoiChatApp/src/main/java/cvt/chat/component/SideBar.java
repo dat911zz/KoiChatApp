@@ -50,7 +50,7 @@ public class SideBar extends JPanel {
 
     private void init() {
         setOpaque(false);
-        layout = new MigLayout("fill, wrap, inset 0", "[fill]", "[34!][fill,shrink 0,::92%]");
+        layout = new MigLayout("fill, wrap, inset 0", "[fill]", "[::5%][fill,shrink 0,::95%]");
         header = createHeader();
         body = createBody();
         
@@ -93,7 +93,7 @@ public class SideBar extends JPanel {
 
     private JPanel createBody() {
         RoundPanel panel = new RoundPanel();
-        panel.setBackground(new Color(46,101,186));
+        panel.setBackground(new Color(255,255,255)); //Color(46,101,186) // comment này không xóa
         panel.setLayout(new MigLayout("wrap,fillx"));
         return panel;
     }

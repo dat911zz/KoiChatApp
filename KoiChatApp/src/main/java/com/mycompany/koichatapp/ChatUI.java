@@ -4,7 +4,18 @@
  */
 package com.mycompany.koichatapp;
 
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.annotations.Nullable;
+import com.google.firebase.internal.NonNull;
 import cvt.chat.component.ChatBox;
+import cvt.chat.model.ChatRoom;
 import cvt.chat.model.ModelMessage;
 import cvt.chat.swing.ChatEvent;
 import java.awt.Color;
@@ -12,13 +23,23 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.AbstractBorder;
@@ -29,61 +50,178 @@ import javax.swing.border.EmptyBorder;
  * @author CVT
  */
 public class ChatUI extends javax.swing.JFrame {
+
     SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy, hh:mmaa");
+    private DatabaseReference userRef;
+    private DatabaseReference chatroomRef;
+    private List<ChatRoom> chatRoomList;
+    private String currentUserName = "vungodat";
+    private String currentRoom = "";
+    private boolean isFirstTime = true;
+    Icon icon = new ImageIcon(getClass().getResource("\\Imgs\\27.png"));
+    Icon icon2 = new ImageIcon(getClass().getResource("\\Imgs\\33.png"));
+
     /**
      * Creates new form ChatUI
      */
     public ChatUI() {
         initComponents();
-        Icon icon = new ImageIcon(getClass().getResource("\\Imgs\\27.png"));
-        Icon icon2 = new ImageIcon(getClass().getResource("\\Imgs\\33.png"));
-        String date = df.format(new Date());
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
+        initFirebase();
+//        loadSideBar();
         load();
     }
-    
+
+    private void loadSideBar() {
+
+        String date = df.format(new Date());
+
+        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
+        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
+        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
+        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
+        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
+        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
+        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
+        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
+        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
+        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
+        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
+        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
+        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
+        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
+        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
+        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
+    }
+
     private void load() {
-        Dimension desktopsize = this.getSize();
-        chatAreaCur.setTitle("Châu Thịnh");
-        chatAreaCur.addChatEvent(new ChatEvent() {
+        // Clear chat room list model
+        chatAreaCur.clearChatBox();
+
+        // Retrieve chat rooms from Firebase database
+        chatroomRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void mousePressedSendButton(ActionEvent evt) {
-                Icon icon = new ImageIcon(getClass().getResource("\\Imgs\\27.png"));
-                String name = "Tôi là ai";
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<ChatRoom> chatRooms = new ArrayList<>();
+                String[] roomName = new String[1];
                 String date = df.format(new Date());
-                String message = chatAreaCur.getText().trim();
-                chatAreaCur.addChatBox(new ModelMessage(icon, name, date, message), ChatBox.BoxType.RIGHT);
-                chatAreaCur.addChatBox(new ModelMessage(new ImageIcon(getClass().getResource("\\Imgs\\33.png")), "Bạn là ai", df.format(new Date()), "Ăn nói xà lơ"), ChatBox.BoxType.LEFT);
-                chatAreaCur.clearTextAndGrabFocus();
+
+                for (DataSnapshot chatRoomSnapshot : dataSnapshot.getChildren()) {
+                    String roomNameTmp = chatRoomSnapshot.child("roomname").getValue(String.class);
+                    if (currentRoom.equals("")) {
+                        if (roomNameTmp.equals("")) {
+                            for(DataSnapshot romDataSnapshot : chatRoomSnapshot.child("members").getChildren()){
+                                String membName = romDataSnapshot.getValue(String.class);
+                                if (!membName.equals(currentUserName)) {
+                                    roomNameTmp = membName;
+                                }
+                            }
+                            
+                        }
+                    }
+                    sideBarMain.addChatBox(new ModelMessage(
+                            icon, 
+                            "Room", 
+                            date, 
+                            roomNameTmp
+                    ));
+                    if (isFirstTime || currentRoom.equals(chatRoomSnapshot.getKey())) {
+                        isFirstTime = false;
+                        roomName[0] = roomNameTmp;
+                        if (roomName[0].equals("")) {
+                            chatRoomSnapshot.child("members").getChildren().forEach(memb -> {
+                                String membName = memb.getValue(String.class);
+                                if (!membName.equals(currentUserName)) {
+                                    roomName[0] = membName;
+                                }
+                            });
+                        }
+                        chatAreaCur.setTitle(roomName[0]);
+                        System.out.println();
+                        chatRoomSnapshot.child("messages").getChildren().forEach(mess -> {
+                            String userName = mess.child("username").getValue(String.class);
+                            String messText = mess.child("message").getValue(String.class);
+                            System.out.println("-- " + userName);
+                            System.out.println("-- " + messText);
+                            String message = chatAreaCur.getText().trim();
+                            if (userName.equals(currentUserName)) {
+                                chatAreaCur.addChatBox(new ModelMessage(icon, userName, date, messText), ChatBox.BoxType.RIGHT);
+                            } else {
+                                chatAreaCur.addChatBox(new ModelMessage(icon, userName, date, messText), ChatBox.BoxType.LEFT);
+                            }
+//                        chatAreaCur.addChatBox(new ModelMessage(icon2, "Bạn là ai", date, "Ăn nói xà lơ"), ChatBox.BoxType.LEFT);
+                            chatAreaCur.clearTextAndGrabFocus();
+                        });
+                    }
+
+//                    chatRooms.add(chatRoom);
+                }
+
+//                // Sort chat rooms by name
+//                Collections.sort(chatRooms, new Comparator<ChatRoom>() {
+//                    @Override
+//                    public int compare(ChatRoom o1, ChatRoom o2) {
+//                        return o1.getName().compareToIgnoreCase(o2.getName());
+//                    }
+//                });
+//                String date = df.format(new Date());
+//
+//                // Add chat rooms to list model
+//                for (ChatRoom chatRoom : chatRooms) {
+//                    chatRoomList.add(chatRoom);
+//                    sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
+//                }
             }
 
             @Override
-            public void mousePressedFileButton(ActionEvent evt) {
-                
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle database error
             }
-
-            @Override
-            public void keyTyped(KeyEvent evt) {
-                
-            }
-            
         });
-        System.out.println(desktopsize.width);
+    }
+
+//    public void listenDataChange() {
+//        chatroomRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot ds) {
+//                chatAreaCur.clearChatBox();
+//                // Loop through all the child nodes of the "messages" node
+//                for (DataSnapshot messageSnapshot : ds.getChildren()) {
+//                    // Get the message data from the snapshot
+//                    String username = messageSnapshot.child("username").getValue(String.class);
+//                    String message = messageSnapshot.child("message").getValue(String.class);
+//                    String timestamp = messageSnapshot.getKey();
+//                    Icon icon = new ImageIcon(getClass().getResource("\\Imgs\\27.png"));
+//                    String name = "Tôi là ai";
+//                    String date = df.format(new Date());
+//                    String message = chatAreaCur.getText().trim();
+//                    chatAreaCur.addChatBox(new ModelMessage(icon, name, date, message), ChatBox.BoxType.RIGHT);
+//                    chatAreaCur.addChatBox(new ModelMessage(new ImageIcon(getClass().getResource("\\Imgs\\33.png")), "Bạn là ai", df.format(new Date()), "Ăn nói xà lơ"), ChatBox.BoxType.LEFT);
+//                    chatAreaCur.clearTextAndGrabFocus();
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError de) {
+//                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+//            }
+//        });
+//    }
+    public void initFirebase() {
+        FileInputStream serviceAccount;
+        try {
+            serviceAccount = new FileInputStream("D:\\Workspace\\Java\\Netbeans\\FirebaseChat\\src\\main\\java\\config\\chatappjavaswing-firebase-adminsdk-jr0kq-328fbe1af0.json");
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setConnectTimeout(10000)
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setDatabaseUrl("https://chatappjavaswing-default-rtdb.firebaseio.com")
+                    .build();
+            FirebaseApp.initializeApp(options);
+            chatroomRef = FirebaseDatabase.getInstance().getReference("chatrooms");
+            userRef = FirebaseDatabase.getInstance().getReference("users");
+        } catch (Exception ex) {
+            Logger.getLogger(ChatCore.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

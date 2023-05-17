@@ -84,10 +84,6 @@ public class frmMain extends javax.swing.JFrame {
     public void initFirebase() {
         FileInputStream serviceAccount;
         try {
-//            serviceAccount = new FileInputStream(
-//                    System.getProperty("user.dir")
-//                    + "/src/main/java/config/"
-//                    + "chatappjavaswing-firebase-adminsdk-jr0kq-328fbe1af0.json");
             serviceAccount = new FileInputStream("D:\\Workspace\\Java\\Netbeans\\FirebaseChat\\src\\main\\java\\config\\chatappjavaswing-firebase-adminsdk-jr0kq-328fbe1af0.json");
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setConnectTimeout(10000)

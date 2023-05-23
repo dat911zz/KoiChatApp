@@ -34,6 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javaswingdev.GoogleMaterialDesignIcon;
+import javaswingdev.GoogleMaterialIcon;
+import javaswingdev.GradientType;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -234,35 +237,17 @@ public class ChatUI extends javax.swing.JFrame {
     private void initComponents() {
 
         backgroundCur = new cvt.chat.swing.Background();
-        chatAreaCur = new cvt.chat.component.ChatArea();
         sideBarMain = new cvt.chat.component.SideBar();
+        chatAreaCur = new cvt.chat.component.ChatArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
 
         backgroundCur.setBackground(new java.awt.Color(255, 255, 255));
         backgroundCur.setForeground(new java.awt.Color(255, 255, 255));
-
-        javax.swing.GroupLayout backgroundCurLayout = new javax.swing.GroupLayout(backgroundCur);
-        backgroundCur.setLayout(backgroundCurLayout);
-        backgroundCurLayout.setHorizontalGroup(
-            backgroundCurLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(backgroundCurLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(sideBarMain, javax.swing.GroupLayout.PREFERRED_SIZE, 357, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(chatAreaCur, javax.swing.GroupLayout.PREFERRED_SIZE, 591, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        backgroundCurLayout.setVerticalGroup(
-            backgroundCurLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backgroundCurLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(backgroundCurLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(sideBarMain, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(chatAreaCur, javax.swing.GroupLayout.DEFAULT_SIZE, 597, Short.MAX_VALUE))
-                .addContainerGap())
-        );
+        backgroundCur.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        backgroundCur.add(sideBarMain, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 380, 620));
+        backgroundCur.add(chatAreaCur, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 0, 600, 620));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -272,9 +257,7 @@ public class ChatUI extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(backgroundCur, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(backgroundCur, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();

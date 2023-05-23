@@ -24,6 +24,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.FileInputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -204,7 +205,9 @@ public class ChatUI extends javax.swing.JFrame {
     public void initFirebase() {
         FileInputStream serviceAccount;
         try {
-            serviceAccount = new FileInputStream("D:\\Workspace\\Java\\Netbeans\\FirebaseChat\\src\\main\\java\\config\\chatappjavaswing-firebase-adminsdk-jr0kq-328fbe1af0.json");
+            URL url = getClass().getClassLoader().getResource("./config/chatappjavaswing-firebase-adminsdk-jr0kq-328fbe1af0.json");
+            System.out.print(url.getFile());
+            serviceAccount = new FileInputStream(url.getFile());
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setConnectTimeout(10000)
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))

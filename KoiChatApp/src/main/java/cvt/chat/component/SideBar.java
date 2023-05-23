@@ -30,10 +30,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import net.miginfocom.swing.MigLayout;
 import cvt.chat.swing.ChatEvent;
+import cvt.chat.swing.CustomButtonEvent;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 
-public class SideBar extends JPanel {
+public class SideBar extends JPanel implements CustomButtonEvent{
 
     private AnimationScroll animationScroll;
     private AnimationFloatingButton animationFloatingButton;
@@ -132,7 +133,9 @@ public class SideBar extends JPanel {
 
     public void addChatBox(ModelMessage message) {
         int values = scrollBody.getVerticalScrollBar().getValue();
-        body.add(new GroupChat(message));
+        GroupChat grChat = new GroupChat(message);
+        grChat.addCustomButtonEventListener(this);
+        body.add(grChat);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -247,4 +250,9 @@ public class SideBar extends JPanel {
     private Button floatingButton;
     private JLabel labelTitle;
     private JPanel header;
+
+    @Override
+    public void onButtonClick(ModelMessage message) {
+        System.out.println("Button clicked! Callback method invoked.\tName: " + message.getName() + ", Mess: " + message.getMessage());
+    }
 }

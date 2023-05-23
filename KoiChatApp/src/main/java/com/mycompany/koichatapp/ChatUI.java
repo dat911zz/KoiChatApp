@@ -97,38 +97,37 @@ public class ChatUI extends javax.swing.JFrame {
     }
 
     private void load() {
-        // Clear chat room list model
-        chatAreaCur.clearChatBox();
 
         // Retrieve chat rooms from Firebase database
-        chatroomRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        chatroomRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                // Clear chat room list model
+                chatAreaCur.clearChatBox();
+                
                 List<ChatRoom> chatRooms = new ArrayList<>();
                 String[] roomName = new String[1];
                 String date = df.format(new Date());
 
                 for (DataSnapshot chatRoomSnapshot : dataSnapshot.getChildren()) {
                     String roomNameTmp = chatRoomSnapshot.child("roomname").getValue(String.class);
-                    if (currentRoom.equals("")) {
-                        if (roomNameTmp.equals("")) {
-                            for(DataSnapshot romDataSnapshot : chatRoomSnapshot.child("members").getChildren()){
-                                String membName = romDataSnapshot.getValue(String.class);
-                                if (!membName.equals(currentUserName)) {
-                                    roomNameTmp = membName;
-                                }
+                    if (roomNameTmp.equals("")) {
+                        for (DataSnapshot romDataSnapshot : chatRoomSnapshot.child("members").getChildren()) {
+                            String membName = romDataSnapshot.getValue(String.class);
+                            if (!membName.equals(currentUserName)) {
+                                roomNameTmp = membName;
                             }
-                            
                         }
                     }
                     sideBarMain.addChatBox(new ModelMessage(
-                            icon, 
-                            "Room", 
-                            date, 
+                            icon,
+                            "Room",
+                            date,
                             roomNameTmp
                     ));
-                    if (isFirstTime || currentRoom.equals(chatRoomSnapshot.getKey())) {
-                        isFirstTime = false;
+
+                    if (isFirstTime || currentRoom.equals(roomNameTmp)) {
+                        currentRoom = roomNameTmp;
                         roomName[0] = roomNameTmp;
                         if (roomName[0].equals("")) {
                             chatRoomSnapshot.child("members").getChildren().forEach(memb -> {
@@ -155,7 +154,9 @@ public class ChatUI extends javax.swing.JFrame {
                             chatAreaCur.clearTextAndGrabFocus();
                         });
                     }
-
+                    if (isFirstTime) {
+                        isFirstTime = false;
+                    }
 //                    chatRooms.add(chatRoom);
                 }
 
@@ -178,6 +179,7 @@ public class ChatUI extends javax.swing.JFrame {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // Handle database error
+                throw databaseError.toException();
             }
         });
     }

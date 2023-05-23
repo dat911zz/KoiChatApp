@@ -11,6 +11,9 @@ import java.awt.geom.RoundRectangle2D;
 import cvt.chat.model.ModelMessage;
 import cvt.chat.swing.AutoWrapText;
 import cvt.chat.swing.ImageAvatar;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -48,6 +51,13 @@ public class ChatBox extends JComponent {
         text.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         text.setOpaque(false);
         text.setEditable(false);
+        text.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                System.err.print("TEST: " + message.getName());
+            }
+        });
         JLabel labelDate = new JLabel(message.getName() + " | " + message.getDate());
         labelDate.setForeground(new Color(127, 127, 127));
         add(avatar, "height 40,width 40");
@@ -74,6 +84,12 @@ public class ChatBox extends JComponent {
         }
         g2.dispose();
         super.paintComponent(g);
+    }
+
+    @Override
+    public synchronized void addMouseListener(MouseListener l) {
+        super.addMouseListener(l); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        System.out.print("Chat box clicked");
     }
 
     public BoxType getBoxType() {

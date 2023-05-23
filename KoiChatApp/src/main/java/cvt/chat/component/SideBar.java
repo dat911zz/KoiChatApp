@@ -131,11 +131,27 @@ public class SideBar extends JPanel implements CustomButtonEvent{
         return scroll;
     }
 
-    public void addChatBox(ModelMessage message) {
+    public void addGroupChat(ModelMessage message) {
         int values = scrollBody.getVerticalScrollBar().getValue();
         GroupChat grChat = new GroupChat(message);
         grChat.addCustomButtonEventListener(this);
         body.add(grChat);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                body.revalidate();
+                scrollBody.getVerticalScrollBar().setValue(values);
+            }
+        });
+        body.repaint();
+        body.revalidate();
+        scrollBody.revalidate();
+        scrollToBottom();
+    }
+    
+    public void addGroupChat(ModelMessage message, boolean active) {
+        int values = scrollBody.getVerticalScrollBar().getValue();
+        body.add(new GroupChat(message, active));
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

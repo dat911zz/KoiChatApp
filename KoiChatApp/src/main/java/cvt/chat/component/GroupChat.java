@@ -12,6 +12,7 @@ import cvt.chat.model.ModelMessage;
 import cvt.chat.swing.AutoWrapText;
 import cvt.chat.swing.CustomButtonEvent;
 import cvt.chat.swing.ImageAvatar;
+import java.awt.event.ContainerListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -30,8 +31,22 @@ import net.miginfocom.swing.MigLayout;
 public class GroupChat extends JComponent {
 
     private final ModelMessage message;
+    private boolean active = false;
+    
+    public Color getColor() {
+        if(active) {
+            return new Color(174, 203, 250);
+        }
+        return new Color(255, 255, 255);
+    }
     private CustomButtonEvent listener;
 
+    public GroupChat(ModelMessage message, boolean active) {
+        this.message = message;
+        this.active = active;
+        init();
+    }
+    
     public GroupChat(ModelMessage message) {
         this.message = message;
         init();
@@ -39,7 +54,8 @@ public class GroupChat extends JComponent {
 
     private void init() {
         initBox();
-    }
+    }   
+    
 
     private void initBox() {
         setLayout(new MigLayout("", "[][300!]", "[center]"));
@@ -50,12 +66,19 @@ public class GroupChat extends JComponent {
         JTextPane text = new JTextPane();
         text.setEditorKit(new AutoWrapText());
         text.setText(message.getMessage());
-        text.setBackground(new Color(255, 255, 255));
+        text.setBackground(getColor());
         text.setForeground(new Color(0, 0, 0));
         text.setSelectionColor(new Color(200, 200, 200, 100));
         //text.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         text.setOpaque(false);
-        text.setEditable(false);     
+        text.setEditable(false);
+        text.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                System.out.print("k");
+                super.mouseClicked(e);
+            }
+        });
         add(avatar, "height 40,width 40");
         add(text, "span");
         
@@ -76,7 +99,7 @@ public class GroupChat extends JComponent {
         int width = getWidth();
         int height = getHeight();
         Area area = new Area(new RoundRectangle2D.Double(0, 0, width, 60, 0, 0));
-        g2.setPaint(new GradientPaint(0, 0, new Color(255,255,255), width, 0, new Color(255,255,255)));
+        g2.setPaint(new GradientPaint(0, 0, getColor(), width, 0, getColor()));
         g2.fill(area);
         g2.dispose();
         super.paintComponent(g);

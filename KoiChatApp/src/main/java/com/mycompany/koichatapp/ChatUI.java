@@ -78,22 +78,11 @@ public class ChatUI extends javax.swing.JFrame {
 
         String date = df.format(new Date());
 
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-        this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
+        this.sideBarMain.addGroupChat(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
+        this.sideBarMain.addGroupChat(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
+        this.sideBarMain.addGroupChat(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
+        this.sideBarMain.addGroupChat(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
+        this.sideBarMain.addGroupChat(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
     }
 
     private void load() {
@@ -119,10 +108,10 @@ public class ChatUI extends javax.swing.JFrame {
                             }
                         }
                     }
-                    sideBarMain.addChatBox(new ModelMessage(
-                            icon,
-                            "Room",
-                            date,
+                    sideBarMain.addGroupChat(new ModelMessage(
+                            icon, 
+                            "Room", 
+                            date, 
                             roomNameTmp
                     ));
 

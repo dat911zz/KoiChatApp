@@ -63,7 +63,6 @@ public class GroupChat extends JComponent {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-//                System.out.print("Chat box clicked");
                 listener.onButtonClick(message);
                 super.mouseClicked(e);
             }

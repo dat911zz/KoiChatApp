@@ -4,6 +4,7 @@
  */
 package com.mycompany.koichatapp;
 
+import dvn.core.ChatCore;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -70,7 +71,8 @@ public class ChatUI extends javax.swing.JFrame {
      */
     public ChatUI() {
         initComponents();
-        initFirebase();
+        chatroomRef = ChatCore.getInstance().getReference("chatrooms");
+            userRef = ChatCore.getInstance().getReference("users");
 //        loadSideBar();
         load();
     }
@@ -183,53 +185,6 @@ public class ChatUI extends javax.swing.JFrame {
                 throw databaseError.toException();
             }
         });
-    }
-
-//    public void listenDataChange() {
-//        chatroomRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot ds) {
-//                chatAreaCur.clearChatBox();
-//                // Loop through all the child nodes of the "messages" node
-//                for (DataSnapshot messageSnapshot : ds.getChildren()) {
-//                    // Get the message data from the snapshot
-//                    String username = messageSnapshot.child("username").getValue(String.class);
-//                    String message = messageSnapshot.child("message").getValue(String.class);
-//                    String timestamp = messageSnapshot.getKey();
-//                    Icon icon = new ImageIcon(getClass().getResource("\\Imgs\\27.png"));
-//                    String name = "Tôi là ai";
-//                    String date = df.format(new Date());
-//                    String message = chatAreaCur.getText().trim();
-//                    chatAreaCur.addChatBox(new ModelMessage(icon, name, date, message), ChatBox.BoxType.RIGHT);
-//                    chatAreaCur.addChatBox(new ModelMessage(new ImageIcon(getClass().getResource("\\Imgs\\33.png")), "Bạn là ai", df.format(new Date()), "Ăn nói xà lơ"), ChatBox.BoxType.LEFT);
-//                    chatAreaCur.clearTextAndGrabFocus();
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError de) {
-//                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-//            }
-//        });
-//    }
-    public void initFirebase() {
-        FileInputStream serviceAccount;
-        try {
-            URL url = getClass().getClassLoader().getResource("./config/chatappjavaswing-firebase-adminsdk-jr0kq-328fbe1af0.json");
-            System.out.print(url.getFile());
-            serviceAccount = new FileInputStream(url.getFile());
-            FirebaseOptions options = new FirebaseOptions.Builder()
-                    .setConnectTimeout(10000)
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .setDatabaseUrl("https://chatappjavaswing-default-rtdb.firebaseio.com")
-                    .build();
-            FirebaseApp.initializeApp(options);
-            chatroomRef = FirebaseDatabase.getInstance().getReference("chatrooms");
-            userRef = FirebaseDatabase.getInstance().getReference("users");
-        } catch (Exception ex) {
-            Logger.getLogger(ChatCore.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     /**

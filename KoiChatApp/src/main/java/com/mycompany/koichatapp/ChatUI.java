@@ -74,7 +74,7 @@ public class ChatUI extends javax.swing.JFrame {
         chatroomRef = ChatCore.getInstance().getReference("chatrooms");
             userRef = ChatCore.getInstance().getReference("users");
 //        loadSideBar();
-        load();
+        addControl();
     }
 
     private void loadSideBar() {
@@ -99,7 +99,7 @@ public class ChatUI extends javax.swing.JFrame {
         this.sideBarMain.addChatBox(new ModelMessage(icon2, "VD", date, "Vũ Đạt"));
     }
 
-    private void load() {
+    private void addControl() {
 
         // Retrieve chat rooms from Firebase database
         chatroomRef.addValueEventListener(new ValueEventListener() {

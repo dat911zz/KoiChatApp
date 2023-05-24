@@ -72,13 +72,6 @@ public class GroupChat extends JComponent {
         //text.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         text.setOpaque(false);
         text.setEditable(false);
-        text.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                System.out.print("k");
-                super.mouseClicked(e);
-            }
-        });
         add(avatar, "height 40,width 40");
         add(text, "span");
         

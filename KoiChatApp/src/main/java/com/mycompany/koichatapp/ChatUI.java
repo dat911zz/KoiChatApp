@@ -8,6 +8,7 @@ import com.mycompany.koichatapp.core.ChatCore;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -70,7 +71,7 @@ public class ChatUI extends javax.swing.JFrame {
     UserData userData;
     private DatabaseReference ref;
     private String currentUserName = "vungodat";
-    private String currentRoom = "0";
+    private String currentRoom = "";
     private boolean isFirstTime = true;
     Icon icon = new ImageIcon(getClass().getClassLoader().getResource("./Imgs/27.png"));
     Icon icon2 = new ImageIcon(getClass().getClassLoader().getResource("./Imgs/33.png"));
@@ -107,15 +108,44 @@ public class ChatUI extends javax.swing.JFrame {
             @Override
             public void onGroupChatClick(MouseEvent event, ModelMessage message) {
                 System.out.println("Clicked: " + message.getName() + " | " + message.getMessage());
+                currentRoom = message.getName();
+                ref.child("chatrooms").child(currentRoom).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot ds) {
+                        var room = ds.getValue(ChatRoom.class);
+                        if (ds.getKey().equals(currentRoom)) {
+                            reloadMessages(room.getMessages());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError de) {
+                        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+                    }
+                });
             }
         });
         chatAreaCur.addChatEvent(new ChatEvent() {
             @Override
             public void mousePressedSendButton(ActionEvent evt) {
                 if (!chatAreaCur.getText().trim().equals("")) {
-                    String newId = (chatData.getChatrooms().get(Integer.parseInt(currentRoom)).getMessages().size()) + "";
+                    String newId = (chatData.getChatrooms().get(currentRoom).getMessages().size()) + "";
                     ChatCore.getInstance().sendMessage(currentRoom, newId, new Message(chatAreaCur.getText(), System.currentTimeMillis(), "vungodat"));
-                    System.out.println("Sended");
+                    System.out.println("Sended");                   
+                    ref.child("chatrooms").child(currentRoom).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot ds) {
+                            var room = ds.getValue(ChatRoom.class);
+                            if (ds.getKey().equals(currentRoom)) {
+                                reloadMessages(room.getMessages());
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError de) {
+                            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+                        }
+                    });
                 }
             }
 
@@ -128,7 +158,7 @@ public class ChatUI extends javax.swing.JFrame {
             }
         });
         // Retrieve chat rooms from Firebase database
-        ref.addValueEventListener(new ValueEventListener() {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<ChatRoom> chatRooms = new ArrayList<>();
@@ -146,65 +176,40 @@ public class ChatUI extends javax.swing.JFrame {
                 throw databaseError.toException();
             }
         });
+        ref.child("chatrooms").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot ds) {
+                System.out.println("Chatroom changed");
+            }
+
+            @Override
+            public void onCancelled(DatabaseError de) {
+                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            }
+        });
+        ref.child("chatrooms").child(currentRoom).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot ds) {
+                System.out.println(currentRoom + ": message changed");
+            }
+
+            @Override
+            public void onCancelled(DatabaseError de) {
+                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            }
+        });
     }
 
     public void fillData(ChatData chatData) {
+        loadData();
+    }
 
-//                for (DataSnapshot chatRoomSnapshot : dataSnapshot.getChildren()) {
-//                    String roomNameTmp = chatRoomSnapshot.child("roomname").getValue(String.class);
-//                    if (roomNameTmp.equals("")) {
-//                        for (DataSnapshot romDataSnapshot : chatRoomSnapshot.child("members").getChildren()) {
-//                            String membName = romDataSnapshot.getValue(String.class);
-//                            if (!membName.equals(currentUserName)) {
-//                                roomNameTmp = membName;
-//                            }
-//                        }
-//                    }
-//                    sideBarMain.addGroupChat(new ModelMessage(
-//                            icon, 
-//                            "Room", 
-//                            date, 
-//                            roomNameTmp
-//                    ));
-//
-//                    if (isFirstTime || currentRoom.equals(roomNameTmp)) {
-//                        currentRoom = roomNameTmp;
-//                        roomName[0] = roomNameTmp;
-//                        if (roomName[0].equals("")) {
-//                            chatRoomSnapshot.child("members").getChildren().forEach(memb -> {
-//                                String membName = memb.getValue(String.class);
-//                                if (!membName.equals(currentUserName)) {
-//                                    roomName[0] = membName;
-//                                }
-//                            });
-//                        }
-//                        chatAreaCur.setTitle(roomName[0]);
-//                        System.out.println();
-//                        chatRoomSnapshot.child("messages").getChildren().forEach(mess -> {
-//                            String userName = mess.child("username").getValue(String.class);
-//                            String messText = mess.child("message").getValue(String.class);
-//                            System.out.println("-- " + userName);
-//                            System.out.println("-- " + messText);
-//                            String message = chatAreaCur.getText().trim();
-//                            if (userName.equals(currentUserName)) {
-//                                chatAreaCur.addChatBox(new ModelMessage(icon, userName, date, messText), ChatBox.BoxType.RIGHT);
-//                            } else {
-//                                chatAreaCur.addChatBox(new ModelMessage(icon, userName, date, messText), ChatBox.BoxType.LEFT);
-//                            }
-////                        chatAreaCur.addChatBox(new ModelMessage(icon2, "Bạn là ai", date, "Ăn nói xà lơ"), ChatBox.BoxType.LEFT);
-//                            chatAreaCur.clearTextAndGrabFocus();
-//                        });
-//                    }
-//                    if (isFirstTime) {
-//                        isFirstTime = false;
-//                    }
-////                    chatRooms.add(chatRoom);
-//                }
+    private void loadData() {
+        sideBarMain.clearChatBox();
 
-        refreshChat();
         LinkedHashMap<String, ChatRoom> sortedMap = sortChatRoom(chatData.getChatrooms());
         for (Map.Entry<String, ChatRoom> room : sortedMap.entrySet()) {
-            currentRoom = room.getValue().getRoomname();
+            String date = df.format(new Date());
             if (room.getValue().getRoomname().equals("")) {
                 for (String userName : room.getValue().getMembers()) {
                     if (!userName.equals(currentUserName)) {
@@ -212,20 +217,35 @@ public class ChatUI extends javax.swing.JFrame {
                     }
                 }
             }
-            String date = df.format(new Date());
             sideBarMain.addGroupChat(new ModelMessage(
                     icon,
                     room.getKey(),
                     date,
                     room.getValue().getRoomname()
             ));
+            if (currentRoom.equals(room.getKey())) {
+                chatAreaCur.setTitle(room.getValue().getRoomname());
+                reloadMessages(room.getValue().getMessages());
+            }
         }
     }
-    private void refreshChat(){
-        // Clear chat room list model
-        sideBarMain.clearChatBox();
+
+    private void reloadMessages(HashMap<String, Message> messages) {
         chatAreaCur.clearChatBox();
+        LinkedHashMap<String, Message> sortedMess = sortMess(messages);
+        for (Map.Entry<String, Message> mess : sortedMess.entrySet()) {
+            String userName = mess.getValue().getUsername();
+            String messText = mess.getValue().getText();
+
+            if (userName.equals(currentUserName)) {
+                chatAreaCur.addChatBox(new ModelMessage(icon, userName, df.format(mess.getValue().getTimestamp()), messText), ChatBox.BoxType.RIGHT);
+            } else {
+                chatAreaCur.addChatBox(new ModelMessage(icon, userName, df.format(mess.getValue().getTimestamp()), messText), ChatBox.BoxType.LEFT);
+            }
+            chatAreaCur.clearTextAndGrabFocus();
+        }
     }
+
     private static LinkedHashMap<String, ChatRoom> sortChatRoom(HashMap<String, ChatRoom> inputHashMap) {
         // Sort the entries based on the age attribute of Child objects
         List<Map.Entry<String, ChatRoom>> sortedEntries = new ArrayList<>(inputHashMap.entrySet());
@@ -233,6 +253,18 @@ public class ChatUI extends javax.swing.JFrame {
         // Create a LinkedHashMap to preserve the order
         LinkedHashMap<String, ChatRoom> sortedMap = new LinkedHashMap<>();
         for (Map.Entry<String, ChatRoom> entry : sortedEntries) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedMap;
+    }
+
+    private static LinkedHashMap<String, Message> sortMess(HashMap<String, Message> inputHashMap) {
+        // Sort the entries based on the age attribute of Child objects
+        List<Map.Entry<String, Message>> sortedEntries = new ArrayList<>(inputHashMap.entrySet());
+        sortedEntries.sort(Comparator.comparingLong(entry -> entry.getValue().getTimestamp()));
+        // Create a LinkedHashMap to preserve the order
+        LinkedHashMap<String, Message> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Message> entry : sortedEntries) {
             sortedMap.put(entry.getKey(), entry.getValue());
         }
         return sortedMap;

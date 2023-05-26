@@ -2,13 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package dvn.core;
+package com.mycompany.koichatapp.core;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.mycompany.koichatapp.dao.ChatRoomDAO;
+import com.mycompany.koichatapp.dao.MessageDAO;
+import com.mycompany.koichatapp.model.Message;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
@@ -63,5 +67,20 @@ public class ChatCore {
             System.err.print(ex.getMessage());
             return null;
         }
+    }
+    
+    public int sendMessage(String chatRoomId, String id, Message message){
+        int rs[] = new int[1];
+        MessageDAO.getInstance().saveMessage(chatRoomId, message, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError de, DatabaseReference dr) {
+                if (de != null) {
+                    rs[0] = -1;
+                }else{
+                    rs[0] = 1;
+                }
+            }
+        });
+        return rs[0];
     }
 }

@@ -4,7 +4,7 @@
  */
 package com.mycompany.koichatapp;
 
-import dvn.core.ChatCore;
+import com.mycompany.koichatapp.core.ChatCore;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -15,15 +15,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.internal.NonNull;
+import com.mycompany.koichatapp.dao.ChatRoomDAO;
+import com.mycompany.koichatapp.dao.MessageDAO;
 import cvt.chat.component.ChatBox;
-import cvt.chat.model.ChatRoom;
+import com.mycompany.koichatapp.model.ChatData;
+import com.mycompany.koichatapp.model.ChatRoom;
+import com.mycompany.koichatapp.model.Message;
+import com.mycompany.koichatapp.model.User;
+import com.mycompany.koichatapp.model.UserData;
 import cvt.chat.model.ModelMessage;
 import cvt.chat.swing.ChatEvent;
+import cvt.chat.swing.GroupChatEvent;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.io.FileInputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -32,6 +40,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -57,11 +66,11 @@ import javax.swing.border.EmptyBorder;
 public class ChatUI extends javax.swing.JFrame {
 
     SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy, hh:mmaa");
-    private DatabaseReference userRef;
-    private DatabaseReference chatroomRef;
-    private List<ChatRoom> chatRoomList;
+    ChatData chatData;
+    UserData userData;
+    private DatabaseReference ref;
     private String currentUserName = "vungodat";
-    private String currentRoom = "";
+    private String currentRoom = "0";
     private boolean isFirstTime = true;
     Icon icon = new ImageIcon(getClass().getClassLoader().getResource("./Imgs/27.png"));
     Icon icon2 = new ImageIcon(getClass().getClassLoader().getResource("./Imgs/33.png"));
@@ -71,10 +80,14 @@ public class ChatUI extends javax.swing.JFrame {
      */
     public ChatUI() {
         initComponents();
-        chatroomRef = ChatCore.getInstance().getReference("chatrooms");
-            userRef = ChatCore.getInstance().getReference("users");
+        ref = ChatCore.getInstance().getReference("");
+        ChatCore.getInstance().setRef(ref);
+        MessageDAO.getInstance().setRef(ref);
+        ChatRoomDAO.getInstance().setRef(ref);
+
 //        loadSideBar();
         addControl();
+
     }
 
     private void loadSideBar() {
@@ -89,83 +102,42 @@ public class ChatUI extends javax.swing.JFrame {
     }
 
     private void addControl() {
+        //Set event click on Group
+        sideBarMain.addGroupChatEvent(new GroupChatEvent() {
+            @Override
+            public void onGroupChatClick(MouseEvent event, ModelMessage message) {
+                System.out.println("Clicked: " + message.getName() + " | " + message.getMessage());
+            }
+        });
+        chatAreaCur.addChatEvent(new ChatEvent() {
+            @Override
+            public void mousePressedSendButton(ActionEvent evt) {
+                if (!chatAreaCur.getText().trim().equals("")) {
+                    String newId = (chatData.getChatrooms().get(Integer.parseInt(currentRoom)).getMessages().size()) + "";
+                    ChatCore.getInstance().sendMessage(currentRoom, newId, new Message(chatAreaCur.getText(), System.currentTimeMillis(), "vungodat"));
+                    System.out.println("Sended");
+                }
+            }
 
+            @Override
+            public void mousePressedFileButton(ActionEvent evt) {
+            }
+
+            @Override
+            public void keyTyped(KeyEvent evt) {
+            }
+        });
         // Retrieve chat rooms from Firebase database
-        chatroomRef.addValueEventListener(new ValueEventListener() {
+        ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // Clear chat room list model
-                chatAreaCur.clearChatBox();
-                
                 List<ChatRoom> chatRooms = new ArrayList<>();
                 String[] roomName = new String[1];
                 String date = df.format(new Date());
 
-                for (DataSnapshot chatRoomSnapshot : dataSnapshot.getChildren()) {
-                    String roomNameTmp = chatRoomSnapshot.child("roomname").getValue(String.class);
-                    if (roomNameTmp.equals("")) {
-                        for (DataSnapshot romDataSnapshot : chatRoomSnapshot.child("members").getChildren()) {
-                            String membName = romDataSnapshot.getValue(String.class);
-                            if (!membName.equals(currentUserName)) {
-                                roomNameTmp = membName;
-                            }
-                        }
-                    }
-                    sideBarMain.addGroupChat(new ModelMessage(
-                            icon, 
-                            "Room", 
-                            date, 
-                            roomNameTmp
-                    ));
-
-                    if (isFirstTime || currentRoom.equals(roomNameTmp)) {
-                        currentRoom = roomNameTmp;
-                        roomName[0] = roomNameTmp;
-                        if (roomName[0].equals("")) {
-                            chatRoomSnapshot.child("members").getChildren().forEach(memb -> {
-                                String membName = memb.getValue(String.class);
-                                if (!membName.equals(currentUserName)) {
-                                    roomName[0] = membName;
-                                }
-                            });
-                        }
-                        chatAreaCur.setTitle(roomName[0]);
-                        System.out.println();
-                        chatRoomSnapshot.child("messages").getChildren().forEach(mess -> {
-                            String userName = mess.child("username").getValue(String.class);
-                            String messText = mess.child("message").getValue(String.class);
-                            System.out.println("-- " + userName);
-                            System.out.println("-- " + messText);
-                            String message = chatAreaCur.getText().trim();
-                            if (userName.equals(currentUserName)) {
-                                chatAreaCur.addChatBox(new ModelMessage(icon, userName, date, messText), ChatBox.BoxType.RIGHT);
-                            } else {
-                                chatAreaCur.addChatBox(new ModelMessage(icon, userName, date, messText), ChatBox.BoxType.LEFT);
-                            }
-//                        chatAreaCur.addChatBox(new ModelMessage(icon2, "Bạn là ai", date, "Ăn nói xà lơ"), ChatBox.BoxType.LEFT);
-                            chatAreaCur.clearTextAndGrabFocus();
-                        });
-                    }
-                    if (isFirstTime) {
-                        isFirstTime = false;
-                    }
-//                    chatRooms.add(chatRoom);
-                }
-
-//                // Sort chat rooms by name
-//                Collections.sort(chatRooms, new Comparator<ChatRoom>() {
-//                    @Override
-//                    public int compare(ChatRoom o1, ChatRoom o2) {
-//                        return o1.getName().compareToIgnoreCase(o2.getName());
-//                    }
-//                });
-//                String date = df.format(new Date());
-//
-//                // Add chat rooms to list model
-//                for (ChatRoom chatRoom : chatRooms) {
-//                    chatRoomList.add(chatRoom);
-//                    sideBarMain.addChatBox(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
-//                }
+                chatData = dataSnapshot.getValue(ChatData.class);
+                userData = dataSnapshot.getValue(UserData.class);
+                fillData(chatData);
             }
 
             @Override
@@ -174,6 +146,106 @@ public class ChatUI extends javax.swing.JFrame {
                 throw databaseError.toException();
             }
         });
+    }
+
+    public void fillData(ChatData chatData) {
+
+//                for (DataSnapshot chatRoomSnapshot : dataSnapshot.getChildren()) {
+//                    String roomNameTmp = chatRoomSnapshot.child("roomname").getValue(String.class);
+//                    if (roomNameTmp.equals("")) {
+//                        for (DataSnapshot romDataSnapshot : chatRoomSnapshot.child("members").getChildren()) {
+//                            String membName = romDataSnapshot.getValue(String.class);
+//                            if (!membName.equals(currentUserName)) {
+//                                roomNameTmp = membName;
+//                            }
+//                        }
+//                    }
+//                    sideBarMain.addGroupChat(new ModelMessage(
+//                            icon, 
+//                            "Room", 
+//                            date, 
+//                            roomNameTmp
+//                    ));
+//
+//                    if (isFirstTime || currentRoom.equals(roomNameTmp)) {
+//                        currentRoom = roomNameTmp;
+//                        roomName[0] = roomNameTmp;
+//                        if (roomName[0].equals("")) {
+//                            chatRoomSnapshot.child("members").getChildren().forEach(memb -> {
+//                                String membName = memb.getValue(String.class);
+//                                if (!membName.equals(currentUserName)) {
+//                                    roomName[0] = membName;
+//                                }
+//                            });
+//                        }
+//                        chatAreaCur.setTitle(roomName[0]);
+//                        System.out.println();
+//                        chatRoomSnapshot.child("messages").getChildren().forEach(mess -> {
+//                            String userName = mess.child("username").getValue(String.class);
+//                            String messText = mess.child("message").getValue(String.class);
+//                            System.out.println("-- " + userName);
+//                            System.out.println("-- " + messText);
+//                            String message = chatAreaCur.getText().trim();
+//                            if (userName.equals(currentUserName)) {
+//                                chatAreaCur.addChatBox(new ModelMessage(icon, userName, date, messText), ChatBox.BoxType.RIGHT);
+//                            } else {
+//                                chatAreaCur.addChatBox(new ModelMessage(icon, userName, date, messText), ChatBox.BoxType.LEFT);
+//                            }
+////                        chatAreaCur.addChatBox(new ModelMessage(icon2, "Bạn là ai", date, "Ăn nói xà lơ"), ChatBox.BoxType.LEFT);
+//                            chatAreaCur.clearTextAndGrabFocus();
+//                        });
+//                    }
+//                    if (isFirstTime) {
+//                        isFirstTime = false;
+//                    }
+////                    chatRooms.add(chatRoom);
+//                }
+
+        refreshChat();
+        LinkedHashMap<String, ChatRoom> sortedMap = sortChatRoom(chatData.getChatrooms());
+        for (Map.Entry<String, ChatRoom> room : sortedMap.entrySet()) {
+            currentRoom = room.getValue().getRoomname();
+            if (room.getValue().getRoomname().equals("")) {
+                for (String userName : room.getValue().getMembers()) {
+                    if (!userName.equals(currentUserName)) {
+                        room.getValue().setRoomname(findUserByUserName(userName).getDisplayname());
+                    }
+                }
+            }
+            String date = df.format(new Date());
+            sideBarMain.addGroupChat(new ModelMessage(
+                    icon,
+                    room.getKey(),
+                    date,
+                    room.getValue().getRoomname()
+            ));
+        }
+    }
+    private void refreshChat(){
+        // Clear chat room list model
+        sideBarMain.clearChatBox();
+        chatAreaCur.clearChatBox();
+    }
+    private static LinkedHashMap<String, ChatRoom> sortChatRoom(HashMap<String, ChatRoom> inputHashMap) {
+        // Sort the entries based on the age attribute of Child objects
+        List<Map.Entry<String, ChatRoom>> sortedEntries = new ArrayList<>(inputHashMap.entrySet());
+        sortedEntries.sort(Comparator.comparingLong(entry -> entry.getValue().getLastAccess()));
+        // Create a LinkedHashMap to preserve the order
+        LinkedHashMap<String, ChatRoom> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<String, ChatRoom> entry : sortedEntries) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedMap;
+    }
+
+    private User findUserByUserName(String username) {
+        User user = new User();
+        for (User u : userData.getUsers()) {
+            if (u.getUsername().equals(username)) {
+                user = u;
+            }
+        }
+        return user;
     }
 
     /**

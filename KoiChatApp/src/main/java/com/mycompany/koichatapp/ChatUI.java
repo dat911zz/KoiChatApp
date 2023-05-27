@@ -62,8 +62,8 @@ public class ChatUI extends javax.swing.JFrame {
     private String currentUserName = "vungodat";
     private String currentRoom = "";
     private boolean isFirstTime = true;
-    Icon icon = new ImageIcon(getClass().getResource("\\Imgs\\27.png"));
-    Icon icon2 = new ImageIcon(getClass().getResource("\\Imgs\\33.png"));
+    Icon icon = new ImageIcon(getClass().getClassLoader().getResource("./Imgs/27.png"));
+    Icon icon2 = new ImageIcon(getClass().getClassLoader().getResource("./Imgs/33.png"));
 
     /**
      * Creates new form ChatUI

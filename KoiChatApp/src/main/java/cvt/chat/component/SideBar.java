@@ -30,20 +30,26 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import net.miginfocom.swing.MigLayout;
 import cvt.chat.swing.ChatEvent;
-import cvt.chat.swing.CustomButtonEvent;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
+import cvt.chat.swing.GroupChatEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import org.apache.avro.generic.GenericData;
 
-public class SideBar extends JPanel implements CustomButtonEvent{
+public class SideBar extends JPanel{
 
     private AnimationScroll animationScroll;
     private AnimationFloatingButton animationFloatingButton;
     private List<ChatEvent> events = new ArrayList<>();
+    private List<GroupChatEvent> gEvents = new ArrayList<>();
 
     public void addChatEvent(ChatEvent event) {
         events.add(event);
     }
-
+    public void addGroupChatEvent(GroupChatEvent event){
+        gEvents.add(event);
+    }
     public SideBar() {
         init();
         initAnimator();
@@ -134,7 +140,15 @@ public class SideBar extends JPanel implements CustomButtonEvent{
     public void addGroupChat(ModelMessage message) {
         int values = scrollBody.getVerticalScrollBar().getValue();
         GroupChat grChat = new GroupChat(message);
-        grChat.addCustomButtonEventListener(this);
+        
+        grChat.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                runOnGroupChatClick(e, message);
+                super.mousePressed(e);
+            }
+            
+        });
         body.add(grChat);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -192,7 +206,12 @@ public class SideBar extends JPanel implements CustomButtonEvent{
             event.keyTyped(evt);
         }
     }
-
+    private void runOnGroupChatClick(MouseEvent e, ModelMessage message){
+        for (GroupChatEvent event : gEvents){
+            event.onGroupChatClick(e, message);
+        }
+    }
+    
     public String getText() {
         return textMessage.getText();
     }
@@ -266,9 +285,4 @@ public class SideBar extends JPanel implements CustomButtonEvent{
     private Button floatingButton;
     private JLabel labelTitle;
     private JPanel header;
-
-    @Override
-    public void onButtonClick(ModelMessage message) {
-        System.out.println("Button clicked! Callback method invoked.\tName: " + message.getName() + ", Mess: " + message.getMessage());
-    }
 }

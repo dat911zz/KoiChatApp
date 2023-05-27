@@ -10,7 +10,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.RoundRectangle2D;
 import cvt.chat.model.ModelMessage;
 import cvt.chat.swing.AutoWrapText;
-import cvt.chat.swing.CustomButtonEvent;
+import cvt.chat.swing.ChatEvent;
 import cvt.chat.swing.ImageAvatar;
 import java.awt.event.ContainerListener;
 import java.awt.event.ActionEvent;
@@ -27,19 +27,33 @@ import javax.swing.Timer;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import net.miginfocom.swing.MigLayout;
+import cvt.chat.swing.GroupChatEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GroupChat extends JComponent {
-
-    private final ModelMessage message;
-    private boolean active = false;
     
+    private final ModelMessage message;
+    private JTextPane textPane;
+    private boolean active = false;
+
     public Color getColor() {
-        if(active) {
+        if (active) {
             return new Color(174, 203, 250);
         }
         return new Color(255, 255, 255);
     }
-    private CustomButtonEvent listener;
+    private List<GroupChatEvent> gEvents = new ArrayList<>();
+
+    public void addGroupChatEvent(GroupChatEvent event) {
+        gEvents.add(event);
+    }
+
+    public void runOnGroupChatClick(MouseEvent e, ModelMessage message) {
+        for (GroupChatEvent event : gEvents) {
+            event.onGroupChatClick(e, message);
+        }
+    }
 
     public GroupChat(ModelMessage message, boolean active) {
         this.message = message;
@@ -51,12 +65,11 @@ public class GroupChat extends JComponent {
         this.message = message;
         init();
     }
-
+    
     private void init() {
         initBox();
-    }   
+    }
     
-
     private void initBox() {
         setLayout(new MigLayout("", "[][]", "[center]"));
         ImageAvatar avatar = new ImageAvatar();
@@ -74,17 +87,8 @@ public class GroupChat extends JComponent {
         text.setEditable(false);
         add(avatar, "height 40,width 40");
         add(text, "span");
-        
-        
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-//                System.out.print("Chat box clicked");
-                listener.onButtonClick(message);
-                super.mouseClicked(e);
-            }
-        });
-    }   
+    }
+    
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
@@ -97,11 +101,8 @@ public class GroupChat extends JComponent {
         g2.dispose();
         super.paintComponent(g);
     }
-
+    
     public ModelMessage getMessage() {
         return message;
-    }
-    public void addCustomButtonEventListener(CustomButtonEvent listener){
-        this.listener = listener;
     }
 }

@@ -4,6 +4,7 @@
  */
 package com.mycompany.koichatapp;
 
+import com.mycompany.koichatapp.core.ChatCore;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;

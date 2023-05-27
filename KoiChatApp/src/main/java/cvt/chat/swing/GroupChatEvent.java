@@ -6,11 +6,13 @@ package cvt.chat.swing;
 
 import cvt.chat.model.ModelMessage;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 
 /**
  *
  * @author datcy
  */
-public interface CustomButtonEvent {
-    public void onButtonClick(ModelMessage message);
+public interface GroupChatEvent {
+
+    public void onGroupChatClick(MouseEvent event, ModelMessage message);
 }

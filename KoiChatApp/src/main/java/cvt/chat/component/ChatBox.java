@@ -86,12 +86,6 @@ public class ChatBox extends JComponent {
         super.paintComponent(g);
     }
 
-    @Override
-    public synchronized void addMouseListener(MouseListener l) {
-        super.addMouseListener(l); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
-        System.out.print("Chat box clicked");
-    }
-
     public BoxType getBoxType() {
         return boxType;
     }

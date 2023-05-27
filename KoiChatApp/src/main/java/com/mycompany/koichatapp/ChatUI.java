@@ -294,11 +294,13 @@ public class ChatUI extends javax.swing.JFrame {
         chatAreaCur = new cvt.chat.component.ChatArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setUndecorated(true);
 
         backgroundCur.setBackground(new java.awt.Color(255, 255, 255));
         backgroundCur.setForeground(new java.awt.Color(255, 255, 255));
+        backgroundCur.setRequestFocusEnabled(false);
         backgroundCur.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        sideBarMain.setFocusable(false);
         backgroundCur.add(sideBarMain, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 380, 620));
         backgroundCur.add(chatAreaCur, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 0, 600, 620));
 
@@ -310,7 +312,7 @@ public class ChatUI extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(backgroundCur, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(backgroundCur, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();

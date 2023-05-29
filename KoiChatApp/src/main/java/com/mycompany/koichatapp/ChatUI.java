@@ -113,12 +113,12 @@ public class ChatUI extends javax.swing.JFrame {
 
 //        loadSideBar();
         addControl();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                ChatRoomFrm frame = new ChatRoomFrm();
-                frame.setVisible(true);
-            }
-        });
+//        SwingUtilities.invokeLater(new Runnable() {
+//            public void run() {
+//                ChatRoomFrm frame = new ChatRoomFrm();
+//                frame.setVisible(true);
+//            }
+//        });
     }
 
     private void loadSideBar() {
@@ -288,20 +288,22 @@ public class ChatUI extends javax.swing.JFrame {
                         }
                     }
                     //Load chat groups
-                    if (currentRoom.equals(room.getKey())) {
-                        sideBarMain.addGroupChat(new ModelMessage(
-                                icon,
-                                room.getKey(),
-                                date,
-                                room.getValue().getRoomname()
-                        ), true);
-                    } else {
-                        sideBarMain.addGroupChat(new ModelMessage(
-                                icon,
-                                room.getKey(),
-                                date,
-                                room.getValue().getRoomname()
-                        ));
+                    if (isUserInGr(currentUserName, room.getValue())) {
+                        if (currentRoom.equals(room.getKey())) {
+                            sideBarMain.addGroupChat(new ModelMessage(
+                                    icon,
+                                    room.getKey(),
+                                    date,
+                                    room.getValue().getRoomname()
+                            ), true);
+                        } else {
+                            sideBarMain.addGroupChat(new ModelMessage(
+                                    icon,
+                                    room.getKey(),
+                                    date,
+                                    room.getValue().getRoomname()
+                            ));
+                        }
                     }
 
                     //Load messages
@@ -363,6 +365,15 @@ public class ChatUI extends javax.swing.JFrame {
             }
         }
         return user;
+    }
+
+    private boolean isUserInGr(String username, ChatRoom room) {
+        for (String uname : room.getMembers()) {
+            if (username.equals(uname)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

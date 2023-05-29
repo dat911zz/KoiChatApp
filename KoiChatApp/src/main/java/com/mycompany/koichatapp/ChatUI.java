@@ -16,10 +16,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.internal.NonNull;
+import com.google.gson.Gson;
+import com.mycompany.koichatapp.core.BaseAPIServices;
 import com.mycompany.koichatapp.dao.ChatRoomDAO;
 import com.mycompany.koichatapp.dao.MessageDAO;
 import cvt.chat.component.ChatBox;
 import com.mycompany.koichatapp.model.ChatData;
+import com.mycompany.koichatapp.model.ChatGPTDTO;
 import com.mycompany.koichatapp.model.ChatRoom;
 import com.mycompany.koichatapp.model.Message;
 import com.mycompany.koichatapp.model.User;
@@ -28,12 +31,16 @@ import cvt.chat.model.ModelMessage;
 import cvt.chat.swing.ChatEvent;
 import cvt.chat.swing.GroupChatEvent;
 import java.awt.Color;
+import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.FileInputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,19 +51,26 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javaswingdev.GoogleMaterialDesignIcon;
 import javaswingdev.GoogleMaterialIcon;
 import javaswingdev.GradientType;
+import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.EmptyBorder;
 
@@ -75,16 +89,26 @@ public class ChatUI extends javax.swing.JFrame {
     private boolean isFirstTime = true;
     Icon icon = new ImageIcon(getClass().getClassLoader().getResource("./Imgs/27.png"));
     Icon icon2 = new ImageIcon(getClass().getClassLoader().getResource("./Imgs/33.png"));
+    Icon gptIcon;
 
     /**
      * Creates new form ChatUI
      */
     public ChatUI() {
         initComponents();
+        try {
+            URL url;
+            url = new URL("https://firebasestorage.googleapis.com/v0/b/chatappjavaswing.appspot.com/o/chatgpt_logo_new.png?alt=media&token=8b6df5a5-04fa-4cc5-856f-c27598fa7647");
+            gptIcon = new ImageIcon(ImageIO.read(url));
+        } catch (Exception ex) {
+            System.out.println("Lỗi: " + ex.getMessage());
+        }
+
         ref = ChatCore.getInstance().getReference("");
         ChatCore.getInstance().setRef(ref);
         MessageDAO.getInstance().setRef(ref);
         ChatRoomDAO.getInstance().setRef(ref);
+//        JOptionPane.showMessageDialog(rootPane, "Đang tải...");
 
 //        loadSideBar();
         addControl();
@@ -109,43 +133,71 @@ public class ChatUI extends javax.swing.JFrame {
             public void onGroupChatClick(MouseEvent event, ModelMessage message) {
                 System.out.println("Clicked: " + message.getName() + " | " + message.getMessage());
                 currentRoom = message.getName();
-                ref.child("chatrooms").child(currentRoom).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot ds) {
-                        var room = ds.getValue(ChatRoom.class);
-                        if (ds.getKey().equals(currentRoom)) {
-                            reloadMessages(room.getMessages());
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError de) {
-                        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-                    }
-                });
+                loadData();
             }
         });
+        //Send message
         chatAreaCur.addChatEvent(new ChatEvent() {
             @Override
             public void mousePressedSendButton(ActionEvent evt) {
-                if (!chatAreaCur.getText().trim().equals("")) {
-                    String newId = (chatData.getChatrooms().get(currentRoom).getMessages().size()) + "";
-                    ChatCore.getInstance().sendMessage(currentRoom, newId, new Message(chatAreaCur.getText(), System.currentTimeMillis(), "vungodat"));
-                    System.out.println("Sended");                   
-                    ref.child("chatrooms").child(currentRoom).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot ds) {
-                            var room = ds.getValue(ChatRoom.class);
-                            if (ds.getKey().equals(currentRoom)) {
-                                reloadMessages(room.getMessages());
-                            }
-                        }
+                if (!chatAreaCur.getText().trim().equals("") && !currentRoom.equals("")) {
+                    if (currentRoom.equals("GPT")) {
+                        System.out.println("Sended");
+                        chatAreaCur.addChatBox(new ModelMessage(icon, currentUserName, df.format(new Date()), chatAreaCur.getText()), ChatBox.BoxType.RIGHT);
 
-                        @Override
-                        public void onCancelled(DatabaseError de) {
-                            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-                        }
-                    });
+                        ExecutorService executorService = Executors.newSingleThreadExecutor();
+                        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+                            @Override
+                            protected Void doInBackground() throws Exception {
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        String res = BaseAPIServices.getInstance().generateResponse(chatAreaCur.getText());
+                                        ChatGPTDTO data = new Gson().fromJson(res, ChatGPTDTO.class);
+                                        String response = data.choices.get(0).message.content;
+                                        chatAreaCur.addChatBox(new ModelMessage(gptIcon, "GPT", df.format(new Date()), response), ChatBox.BoxType.LEFT);
+                                    }
+                                });
+                                return null;
+                            }
+
+                            @Override
+                            protected void done() {
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        chatAreaCur.clearTextAndGrabFocus();
+                                    }
+                                });
+                            }
+                        };
+                        executorService.execute(worker);
+
+                    } else {
+                        System.out.println("Sended");
+                        String newId = (chatData.getChatrooms().get(currentRoom).getMessages().size()) + "";
+                        ChatCore.getInstance().sendMessage(currentRoom, newId, new Message(chatAreaCur.getText(), System.currentTimeMillis(), currentUserName));
+                        ref.child("chatrooms").child(currentRoom).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot ds) {
+                                var room = ds.getValue(ChatRoom.class);
+                                if (ds.getKey().equals(currentRoom)) {
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            reloadMessages(room.getMessages());
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError de) {
+                                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+                            }
+                        });
+                    }
+
                 }
             }
 
@@ -207,27 +259,62 @@ public class ChatUI extends javax.swing.JFrame {
     private void loadData() {
         sideBarMain.clearChatBox();
 
-        LinkedHashMap<String, ChatRoom> sortedMap = sortChatRoom(chatData.getChatrooms());
-        for (Map.Entry<String, ChatRoom> room : sortedMap.entrySet()) {
-            String date = df.format(new Date());
-            if (room.getValue().getRoomname().equals("")) {
-                for (String userName : room.getValue().getMembers()) {
-                    if (!userName.equals(currentUserName)) {
-                        room.getValue().setRoomname(findUserByUserName(userName).getDisplayname());
+        if (currentRoom.equals("GPT")) {
+            chatAreaCur.clearChatBox();
+            sideBarMain.addGroupChat(new ModelMessage(
+                    gptIcon,
+                    "GPT",
+                    df.format(new Date()),
+                    "Chat Bot"
+            ), true);
+        } else {
+            sideBarMain.addGroupChat(new ModelMessage(
+                    gptIcon,
+                    "GPT",
+                    df.format(new Date()),
+                    "Chat Bot"
+            ));
+        }
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                LinkedHashMap<String, ChatRoom> sortedMap = sortChatRoom(chatData.getChatrooms());
+                for (Map.Entry<String, ChatRoom> room : sortedMap.entrySet()) {
+                    String date = df.format(new Date());
+                    if (room.getValue().getRoomname().equals("")) {
+                        for (String userName : room.getValue().getMembers()) {
+                            if (!userName.equals(currentUserName)) {
+                                room.getValue().setRoomname(findUserByUserName(userName).getDisplayname());
+                            }
+                        }
+                    }
+                    //Load chat groups
+                    if (currentRoom.equals(room.getKey())) {
+                        sideBarMain.addGroupChat(new ModelMessage(
+                                icon,
+                                room.getKey(),
+                                date,
+                                room.getValue().getRoomname()
+                        ), true);
+                    } else {
+                        sideBarMain.addGroupChat(new ModelMessage(
+                                icon,
+                                room.getKey(),
+                                date,
+                                room.getValue().getRoomname()
+                        ));
+                    }
+
+                    //Load messages
+                    if (currentRoom.equals(room.getKey())) {
+                        chatAreaCur.setTitle(room.getValue().getRoomname());
+                        reloadMessages(room.getValue().getMessages());
                     }
                 }
             }
-            sideBarMain.addGroupChat(new ModelMessage(
-                    icon,
-                    room.getKey(),
-                    date,
-                    room.getValue().getRoomname()
-            ));
-            if (currentRoom.equals(room.getKey())) {
-                chatAreaCur.setTitle(room.getValue().getRoomname());
-                reloadMessages(room.getValue().getMessages());
-            }
-        }
+        });
+
     }
 
     private void reloadMessages(HashMap<String, Message> messages) {
@@ -272,9 +359,9 @@ public class ChatUI extends javax.swing.JFrame {
 
     private User findUserByUserName(String username) {
         User user = new User();
-        for (User u : userData.getUsers()) {
-            if (u.getUsername().equals(username)) {
-                user = u;
+        for (Map.Entry<String, User> u : userData.getUsers().entrySet()) {
+            if (u.getValue().getUsername().equals(username)) {
+                user = u.getValue();
             }
         }
         return user;

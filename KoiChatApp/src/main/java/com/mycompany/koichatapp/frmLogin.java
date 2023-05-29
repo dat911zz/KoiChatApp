@@ -199,10 +199,12 @@ public class frmLogin extends javax.swing.JDialog {
         // TODO add your handling code here:
         String name = txtName.getText().trim();
         String password = new String(txtPass.getPassword());
-        User user = findUserByUserName(name);
-        if (user != null) {
-            if (password.equals(user.getPassword())) {
-                System.out.println("Dang nhap thanh cong");
+
+        try {
+            UserRecord user = FirebaseAuth.getInstance().getUserByEmail(email);
+            if (user!= null) {
+                System.err.println("Dang nhap thanh cong"+ password);
+                System.err.println("Dang nhap thanh cong"+ user.getUid());
             }
         } else {
             JOptionPane.showConfirmDialog(this, "Sai thông tin tài khoản", "Lỗi", JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE);

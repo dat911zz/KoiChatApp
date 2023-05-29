@@ -179,8 +179,7 @@ public class frmLogin extends javax.swing.JDialog {
         try {
             UserRecord user = FirebaseAuth.getInstance().getUserByEmail(email);
             if (user!= null) {
-                System.err.println("Dang nhap thanh cong"+ password);
-                System.err.println("Dang nhap thanh cong"+ user.getUid());
+                System.err.println("Xin chào "+ user.getEmail() + " đã đăng nhập thành công!");
             }
 
         } catch (FirebaseAuthException e) {

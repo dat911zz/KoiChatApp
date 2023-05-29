@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
-            <version>6.10.0</version>
+            <version>9.1.1</version>
         </dependency>
         <dependency>
             <groupId> org.apache.cassandra</groupId>
@@ -53,6 +53,12 @@
             <groupId>unknown.binary</groupId>
             <artifactId>MyLIB</artifactId>
             <version>CVT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.firebase</groupId>
+            <artifactId>firebase-client</artifactId>
+            <version>2.2.4</version>
+            <type>pom</type>
         </dependency>
     </dependencies>
 </project>

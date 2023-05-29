@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.mycompany.koichatapp.model.User;
 import com.mycompany.koichatapp.model.UserData;
+import java.util.Map;
 import javax.swing.JOptionPane;
 
 /**
@@ -58,9 +59,9 @@ public class frmLogin extends javax.swing.JDialog {
 
     private User findUserByUserName(String username) {
         User user = new User();
-        for (User u : userData.getUsers()) {
-            if (u.getUsername().equals(username)) {
-                user = u;
+        for (Map.Entry<String, User> u : userData.getUsers().entrySet()) {
+            if (u.getValue().getUsername().equals(username)) {
+                user = u.getValue();
             }
         }
         return user;

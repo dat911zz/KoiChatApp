@@ -12,7 +12,7 @@ public class User {
     private String avatar;
     private String displayname;
     private Information information;
-    private int password;
+    private String password;
     private String username;
 
     public String getAvatar() {
@@ -39,11 +39,11 @@ public class User {
         this.information = information;
     }
 
-    public int getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    public void setPassword(int password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 

@@ -4,11 +4,23 @@
  */
 package com.mycompany.koichatapp;
 
+import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.mycompany.koichatapp.core.ChatCore;
+import com.mycompany.koichatapp.model.ChatData;
+import com.mycompany.koichatapp.model.ChatRoom;
+import com.mycompany.koichatapp.model.UserData;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 /**
@@ -16,13 +28,28 @@ import javax.swing.JOptionPane;
  * @author nguye
  */
 public class frmDangKi extends javax.swing.JFrame {
+
     private DatabaseReference ref;
+    UserData userData;
+
     /**
      * Creates new form frmDangKi
      */
     public frmDangKi() {
         initComponents();
         ref = ChatCore.getInstance().getReference("");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                userData = dataSnapshot.getValue(UserData.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle database error
+                throw databaseError.toException();
+            }
+        });
     }
 
     /**
@@ -131,29 +158,12 @@ public class frmDangKi extends javax.swing.JFrame {
 
     private void btnSignUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignUpActionPerformed
         // TODO add your handling code here:
-        try {
-            // Khởi tạo đối tượng FirebaseAuth
-            FirebaseAuth auth = FirebaseAuth.getInstance();
-            // Tạo tài khoản với email và mật khẩu
-            String email = txtName.getText().toString().trim();
-            String password = new  String(txtPass.getPassword());
-            UserRecord.CreateRequest request = new UserRecord.CreateRequest()
-                    .setEmail(email)
-                    .setPassword(password);
-            UserRecord userRecord = auth.createUser(request);
 
-            // In ra thông tin tài khoản đã đăng ký
-            System.out.println("Successfully created new user: " + userRecord.getUid());
-
-        } catch (FirebaseAuthException e) {
-            // Xử lý khi có lỗi xảy ra
-            System.out.println("Error creating new user: " + e.getMessage());
-        }
     }//GEN-LAST:event_btnSignUpActionPerformed
 
     private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
         // TODO add your handling code here:
-        int rs = JOptionPane.showConfirmDialog(this, "Bạn có muốn thoát không?","Thoát",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+        int rs = JOptionPane.showConfirmDialog(this, "Bạn có muốn thoát không?", "Thoát", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (rs == JOptionPane.YES_OPTION) {
             dispose();
         }

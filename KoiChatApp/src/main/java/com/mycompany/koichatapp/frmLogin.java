@@ -15,6 +15,11 @@ import java.util.List;
 import java.util.function.Consumer;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+import com.mycompany.koichatapp.model.User;
+import com.mycompany.koichatapp.model.UserData;
 import javax.swing.JOptionPane;
 
 /**
@@ -28,6 +33,7 @@ public class frmLogin extends javax.swing.JDialog {
     private String strTenND;
     private boolean bKQDN = false;
     private DatabaseReference ref;
+    UserData userData;
 
     /**
      * Creates new form frmDangNhap1
@@ -36,10 +42,28 @@ public class frmLogin extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         ref = ChatCore.getInstance().getReference("");
-        
-        
-        
-        
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                userData = dataSnapshot.getValue(UserData.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle database error
+                throw databaseError.toException();
+            }
+        });
+    }
+
+    private User findUserByUserName(String username) {
+        User user = new User();
+        for (User u : userData.getUsers()) {
+            if (u.getUsername().equals(username)) {
+                user = u;
+            }
+        }
+        return user;
     }
 
     public void addControl() {
@@ -173,24 +197,22 @@ public class frmLogin extends javax.swing.JDialog {
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
         // TODO add your handling code here:
-        String email = txtName.getText().trim();
+        String name = txtName.getText().trim();
         String password = new String(txtPass.getPassword());
-
-        try {
-            UserRecord user = FirebaseAuth.getInstance().getUserByEmail(email);
-            if (user!= null) {
-                System.err.println("Dang nhap thanh cong"+ password);
-                System.err.println("Dang nhap thanh cong"+ user.getUid());
+        User user = findUserByUserName(name);
+        if (user != null) {
+            if (password.equals(user.getPassword())) {
+                System.out.println("Dang nhap thanh cong");
             }
-
-        } catch (FirebaseAuthException e) {
-            e.printStackTrace();
+        } else {
+            JOptionPane.showConfirmDialog(this, "Sai thông tin tài khoản", "Lỗi", JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE);
+            System.out.println("lognin fall");
         }
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
         // TODO add your handling code here:
-        int rs = JOptionPane.showConfirmDialog(this, "Bạn có muốn thoát không?","Thoát",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+        int rs = JOptionPane.showConfirmDialog(this, "Bạn có muốn thoát không?", "Thoát", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (rs == JOptionPane.YES_OPTION) {
             dispose();
         }

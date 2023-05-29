@@ -18,6 +18,7 @@ import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.internal.NonNull;
 import com.google.gson.Gson;
 import com.mycompany.koichatapp.core.BaseAPIServices;
+import com.mycompany.koichatapp.core.ChatRoomFrm;
 import com.mycompany.koichatapp.dao.ChatRoomDAO;
 import com.mycompany.koichatapp.dao.MessageDAO;
 import cvt.chat.component.ChatBox;
@@ -84,7 +85,7 @@ public class ChatUI extends javax.swing.JFrame {
     ChatData chatData;
     UserData userData;
     private DatabaseReference ref;
-    private String currentUserName = "vungodat";
+    private String currentUserName = "chauvanthinh";
     private String currentRoom = "";
     private boolean isFirstTime = true;
     Icon icon = new ImageIcon(getClass().getClassLoader().getResource("./Imgs/27.png"));
@@ -112,7 +113,12 @@ public class ChatUI extends javax.swing.JFrame {
 
 //        loadSideBar();
         addControl();
-
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                ChatRoomFrm frame = new ChatRoomFrm();
+                frame.setVisible(true);
+            }
+        });
     }
 
     private void loadSideBar() {
@@ -126,6 +132,25 @@ public class ChatUI extends javax.swing.JFrame {
         this.sideBarMain.addGroupChat(new ModelMessage(icon, "CVT", date, "Châu Thịnh"));
     }
 
+    public void onChangeMessageInCurrentGr() {
+        if (!currentRoom.equals("") && !currentRoom.equals("GPT")) {
+            ref.child("chatrooms").child(currentRoom).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot ds) {
+                    var room = ds.getValue(ChatRoom.class);
+                    if (ds.getKey().equals(currentRoom)) {
+                        reloadMessages(room.getMessages());
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError de) {
+                    throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+                }
+            });
+        }
+    }
+
     private void addControl() {
         //Set event click on Group
         sideBarMain.addGroupChatEvent(new GroupChatEvent() {
@@ -133,7 +158,7 @@ public class ChatUI extends javax.swing.JFrame {
             public void onGroupChatClick(MouseEvent event, ModelMessage message) {
                 System.out.println("Clicked: " + message.getName() + " | " + message.getMessage());
                 currentRoom = message.getName();
-                loadData();
+                onChangeMessageInCurrentGr();
             }
         });
         //Send message
@@ -177,25 +202,8 @@ public class ChatUI extends javax.swing.JFrame {
                         System.out.println("Sended");
                         String newId = (chatData.getChatrooms().get(currentRoom).getMessages().size()) + "";
                         ChatCore.getInstance().sendMessage(currentRoom, newId, new Message(chatAreaCur.getText(), System.currentTimeMillis(), currentUserName));
-                        ref.child("chatrooms").child(currentRoom).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot ds) {
-                                var room = ds.getValue(ChatRoom.class);
-                                if (ds.getKey().equals(currentRoom)) {
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            reloadMessages(room.getMessages());
-                                        }
-                                    });
-                                }
-                            }
+                        onChangeMessageInCurrentGr();
 
-                            @Override
-                            public void onCancelled(DatabaseError de) {
-                                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-                            }
-                        });
                     }
 
                 }
@@ -239,17 +247,7 @@ public class ChatUI extends javax.swing.JFrame {
                 throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
             }
         });
-        ref.child("chatrooms").child(currentRoom).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot ds) {
-                System.out.println(currentRoom + ": message changed");
-            }
 
-            @Override
-            public void onCancelled(DatabaseError de) {
-                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-            }
-        });
     }
 
     public void fillData(ChatData chatData) {
@@ -325,9 +323,9 @@ public class ChatUI extends javax.swing.JFrame {
             String messText = mess.getValue().getText();
 
             if (userName.equals(currentUserName)) {
-                chatAreaCur.addChatBox(new ModelMessage(icon, userName, df.format(mess.getValue().getTimestamp()), messText), ChatBox.BoxType.RIGHT);
+                chatAreaCur.addChatBox(new ModelMessage(icon, findUserByUserName(userName).getDisplayname(), df.format(mess.getValue().getTimestamp()), messText), ChatBox.BoxType.RIGHT);
             } else {
-                chatAreaCur.addChatBox(new ModelMessage(icon, userName, df.format(mess.getValue().getTimestamp()), messText), ChatBox.BoxType.LEFT);
+                chatAreaCur.addChatBox(new ModelMessage(icon, findUserByUserName(userName).getDisplayname(), df.format(mess.getValue().getTimestamp()), messText), ChatBox.BoxType.LEFT);
             }
             chatAreaCur.clearTextAndGrabFocus();
         }

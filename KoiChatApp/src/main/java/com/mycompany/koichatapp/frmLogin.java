@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.mycompany.koichatapp.model.User;
 import com.mycompany.koichatapp.model.UserData;
+import java.util.Map;
 import javax.swing.JOptionPane;
 
 /**
@@ -58,9 +59,9 @@ public class frmLogin extends javax.swing.JDialog {
 
     private User findUserByUserName(String username) {
         User user = new User();
-        for (User u : userData.getUsers()) {
-            if (u.getUsername().equals(username)) {
-                user = u;
+        for (Map.Entry<String, User> u : userData.getUsers().entrySet()) {
+            if (u.getValue().getUsername().equals(username)) {
+                user = u.getValue();
             }
         }
         return user;
@@ -201,14 +202,16 @@ public class frmLogin extends javax.swing.JDialog {
         String password = new String(txtPass.getPassword());
 
         try {
-            UserRecord user = FirebaseAuth.getInstance().getUserByEmail(email);
-            if (user!= null) {
-                System.err.println("Dang nhap thanh cong"+ password);
-                System.err.println("Dang nhap thanh cong"+ user.getUid());
+            UserRecord user = FirebaseAuth.getInstance().getUserByEmail(name);
+            if (user != null) {
+                System.err.println("Dang nhap thanh cong" + password);
+                System.err.println("Dang nhap thanh cong" + user.getUid());
+            } else {
+                JOptionPane.showConfirmDialog(this, "Sai thông tin tài khoản", "Lỗi", JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("lognin fall");
             }
-        } else {
-            JOptionPane.showConfirmDialog(this, "Sai thông tin tài khoản", "Lỗi", JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE);
-            System.out.println("lognin fall");
+        } catch (Exception ex) {
+            System.out.println("lognin fall with err: " + ex.getMessage());
         }
     }//GEN-LAST:event_btnLoginActionPerformed
 

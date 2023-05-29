@@ -200,15 +200,14 @@ public class frmLogin extends javax.swing.JDialog {
         String name = txtName.getText().trim();
         String password = new String(txtPass.getPassword());
 
-        try {
-            UserRecord user = FirebaseAuth.getInstance().getUserByEmail(email);
-            if (user!= null) {
-                System.err.println("Dang nhap thanh cong"+ password);
-                System.err.println("Dang nhap thanh cong"+ user.getUid());
-            }
-        } else {
+        User user = findUserByUserName(name);
+        if(password.equals(user.getPassword()))
+        {
+            System.out.println("Dang nhap thanh cong");
+        }
+        else {
             JOptionPane.showConfirmDialog(this, "Sai thông tin tài khoản", "Lỗi", JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE);
-            System.out.println("lognin fall");
+            System.out.println("Dang nhap that bai");
         }
     }//GEN-LAST:event_btnLoginActionPerformed
 

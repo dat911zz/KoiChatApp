@@ -12,7 +12,7 @@ public class KoiChatApp {
 
     public static void main(String[] args) {
         System.out.println("Hello World!");
-        new frmMain().show();
-
+        //new frmMain().show();
+        new ChatUI().show();
     }
 }

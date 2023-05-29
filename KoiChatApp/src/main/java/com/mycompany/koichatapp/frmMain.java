@@ -4,6 +4,7 @@
  */
 package com.mycompany.koichatapp;
 
+import com.mycompany.koichatapp.core.ChatCore;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -84,10 +85,6 @@ public class frmMain extends javax.swing.JFrame {
     public void initFirebase() {
         FileInputStream serviceAccount;
         try {
-//            serviceAccount = new FileInputStream(
-//                    System.getProperty("user.dir")
-//                    + "/src/main/java/config/"
-//                    + "chatappjavaswing-firebase-adminsdk-jr0kq-328fbe1af0.json");
             serviceAccount = new FileInputStream("D:\\Workspace\\Java\\Netbeans\\FirebaseChat\\src\\main\\java\\config\\chatappjavaswing-firebase-adminsdk-jr0kq-328fbe1af0.json");
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setConnectTimeout(10000)

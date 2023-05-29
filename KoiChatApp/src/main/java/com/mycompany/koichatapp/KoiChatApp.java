@@ -11,8 +11,8 @@ package com.mycompany.koichatapp;
 public class KoiChatApp {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
         //new frmMain().show();
-        new ChatUI().show();
+//        new ChatUI().show();
+        new frmLogin(new javax.swing.JFrame(), true).show();
     }
 }

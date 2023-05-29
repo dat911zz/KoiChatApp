@@ -85,6 +85,7 @@ public class frmDangKi extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Koi chatapp - Register screen");
 
         btnSignUp.setText("Đăng kí");
         btnSignUp.addActionListener(new java.awt.event.ActionListener() {

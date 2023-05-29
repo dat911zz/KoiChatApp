@@ -240,12 +240,15 @@ public class SideBar extends JPanel{
     private JPanel createHeader() {
         RoundPanel panel = new RoundPanel();
         panel.setBackground(new Color(70, 100, 136));
-        panel.setLayout(new MigLayout("fill, inset 3", "[fill][fill,34!]", "[34!]"));
+        panel.setLayout(new MigLayout("fill, inset 3", "[fill][fill,34!][fill,34!]", "[34!]"));
         GoogleMaterialIcon iconSearch = new GoogleMaterialIcon(GoogleMaterialDesignIcon.SEARCH, GradientType.VERTICAL, new Color(0, 133, 237), new Color(90, 182, 255), 20);
-        GoogleMaterialIcon iconEmot = new GoogleMaterialIcon(GoogleMaterialDesignIcon.INSERT_EMOTICON, GradientType.VERTICAL, new Color(210, 210, 210), new Color(255, 255, 255), 20);
+        GoogleMaterialIcon iconAddGroup = new GoogleMaterialIcon(GoogleMaterialDesignIcon.GROUP_ADD, GradientType.VERTICAL, new Color(0, 133, 237), new Color(90, 182, 255), 20);
         
-        Button cmdSend = new Button();
-        cmdSend.setIcon(iconSearch.toIcon());
+        Button cmdSearch = new Button();
+        cmdSearch.setIcon(iconSearch.toIcon());
+        Button cmdAddGroup = new Button();
+        cmdAddGroup.setIcon(iconAddGroup.toIcon());
+        
         textMessage = new TextField();
         textMessage.setHint("Tìm mọi người ...");
         textMessage.addKeyListener(new KeyAdapter() {
@@ -259,7 +262,13 @@ public class SideBar extends JPanel{
                 runEventKeyTyped(ke);
             }
         });
-        cmdSend.addActionListener(new ActionListener() {
+        cmdSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                runEventMousePressedSendButton(e);
+            }
+        });
+        cmdAddGroup.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 runEventMousePressedSendButton(e);
@@ -272,7 +281,8 @@ public class SideBar extends JPanel{
         scroll.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 0));
         scroll.setBackground(new Color(70, 100, 136));
         panel.add(scroll);
-        panel.add(cmdSend, "height 34!");
+        panel.add(cmdSearch, "height 34!");
+        panel.add(cmdAddGroup, "height 34!");
         return panel;
     }
 

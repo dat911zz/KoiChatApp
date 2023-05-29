@@ -4,20 +4,20 @@
  */
 package com.mycompany.koichatapp.model;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
  * @author datcy
  */
 public class UserData {
-    private ArrayList<User> users;
+    private HashMap<String, User> users;
 
-    public ArrayList<User> getUsers() {
+    public HashMap<String, User>getUsers() {
         return users;
     }
 
-    public void setUsers(ArrayList<User> users) {
+    public void setUsers(HashMap<String, User> users) {
         this.users = users;
     }
     

@@ -8,7 +8,16 @@ package com.mycompany.koichatapp.model;
  *
  * @author datcy
  */
-class Information {
+public class Information {
+
+    public Information(String dateofbirth, String fullname, String gender) {
+        this.dateofbirth = dateofbirth;
+        this.fullname = fullname;
+        this.gender = gender;
+    }
+
+    public Information() {
+    }
     private String dateofbirth;
     private String fullname;
     private String gender;

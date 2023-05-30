@@ -9,6 +9,17 @@ package com.mycompany.koichatapp.model;
  * @author datcy
  */
 public class User {
+
+    public User() {
+    }
+
+    public User(String avatar, String displayname, Information information, String password, String username) {
+        this.avatar = avatar;
+        this.displayname = displayname;
+        this.information = information;
+        this.password = password;
+        this.username = username;
+    }
     private String avatar;
     private String displayname;
     private Information information;

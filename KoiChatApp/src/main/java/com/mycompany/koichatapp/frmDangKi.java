@@ -17,11 +17,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.mycompany.koichatapp.core.ChatCore;
 import com.mycompany.koichatapp.model.ChatData;
 import com.mycompany.koichatapp.model.ChatRoom;
+import com.mycompany.koichatapp.model.Message;
+import com.mycompany.koichatapp.model.User;
 import com.mycompany.koichatapp.model.UserData;
+import com.mycompany.koichatapp.model.Information;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -33,6 +37,7 @@ public class frmDangKi extends javax.swing.JFrame {
 
     private DatabaseReference ref;
     UserData userData;
+    private String imagepath = "";
 
     /**
      * Creates new form frmDangKi
@@ -69,20 +74,20 @@ public class frmDangKi extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        txtName = new javax.swing.JTextField();
+        txtUsername = new javax.swing.JTextField();
         txtPass = new javax.swing.JPasswordField();
         jLabel3 = new javax.swing.JLabel();
-        txtName1 = new javax.swing.JTextField();
+        txtDisplayName = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        txtName2 = new javax.swing.JTextField();
-        txtPass1 = new javax.swing.JPasswordField();
+        txtFullName = new javax.swing.JTextField();
         btnOpenFile = new javax.swing.JButton();
         NuBtn = new javax.swing.JRadioButton();
         jLabel6 = new javax.swing.JLabel();
         NamBtn = new javax.swing.JRadioButton();
         jLabel7 = new javax.swing.JLabel();
+        txtDOB = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Koi chatapp - Register screen");
@@ -107,13 +112,13 @@ public class frmDangKi extends javax.swing.JFrame {
 
         jLabel2.setText("Mật khẩu");
 
-        txtName.setToolTipText("Nhập tên đăng nhập");
+        txtUsername.setToolTipText("Nhập tên đăng nhập");
 
         txtPass.setToolTipText("Nhập mật khẩu");
 
         jLabel3.setText("Tên hiển thị");
 
-        txtName1.setToolTipText("Nhập tên đăng nhập");
+        txtDisplayName.setToolTipText("Nhập tên đăng nhập");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -127,9 +132,9 @@ public class frmDangKi extends javax.swing.JFrame {
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtName)
+                    .addComponent(txtUsername)
                     .addComponent(txtPass)
-                    .addComponent(txtName1, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtDisplayName, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(42, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -138,7 +143,7 @@ public class frmDangKi extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtPass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -146,7 +151,7 @@ public class frmDangKi extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(txtName1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtDisplayName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(12, Short.MAX_VALUE))
         );
 
@@ -156,9 +161,7 @@ public class frmDangKi extends javax.swing.JFrame {
 
         jLabel5.setText("Ngày sinh");
 
-        txtName2.setToolTipText("Nhập tên đăng nhập");
-
-        txtPass1.setToolTipText("Nhập mật khẩu");
+        txtFullName.setToolTipText("Nhập tên đăng nhập");
 
         btnOpenFile.setText("Chọn file");
         btnOpenFile.addActionListener(new java.awt.event.ActionListener() {
@@ -188,6 +191,8 @@ public class frmDangKi extends javax.swing.JFrame {
 
         jLabel7.setText("Chọn ảnh đại diện");
 
+        txtDOB.setToolTipText("Nhập tên đăng nhập");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -206,12 +211,12 @@ public class frmDangKi extends javax.swing.JFrame {
                     .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtName2)
-                    .addComponent(txtPass1)
+                    .addComponent(txtFullName)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(NamBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
-                        .addComponent(NuBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(NuBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtDOB))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
@@ -220,12 +225,12 @@ public class frmDangKi extends javax.swing.JFrame {
                 .addGap(21, 21, 21)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(txtName2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtFullName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtPass1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
-                .addGap(18, 18, 18)
+                    .addComponent(jLabel5)
+                    .addComponent(txtDOB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(21, 21, 21)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
                     .addComponent(NamBtn)
@@ -275,8 +280,36 @@ public class frmDangKi extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    public void saveUser( User user, DatabaseReference.CompletionListener completionListener) {
+        DatabaseReference userRef = ref.child("users");
+        DatabaseReference newUserRef = userRef.push();
+        String id = newUserRef.getKey();
+        userRef.child(id).setValue(user, completionListener);
+    }
+    
     private void btnSignUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignUpActionPerformed
         // TODO add your handling code here:
+        String gender = "male";        
+               
+        if(NuBtn.isSelected())
+            gender = "female"; 
+        
+        String pass = String.valueOf(txtPass.getPassword());
+
+        Information info = new Information(txtDOB.getText(), txtFullName.getText(), gender);
+        
+        saveUser(new User(imagepath, txtDisplayName.getText(), info, pass,txtUsername.getText()), new DatabaseReference.CompletionListener(){
+            @Override
+            public void onComplete(DatabaseError de, DatabaseReference dr) {
+                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            }
+        });
+        
+        JOptionPane.showConfirmDialog(this, "Chúc mừng bạn, đăng ký thành công!", "Đăng ký thành công", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+        this.dispose();
+        
+        new frmLogin(new javax.swing.JFrame(), true).show();
 
     }//GEN-LAST:event_btnSignUpActionPerformed
 
@@ -296,7 +329,7 @@ public class frmDangKi extends javax.swing.JFrame {
         
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
-            System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+            imagepath = selectedFile.getAbsolutePath();
         }
     }//GEN-LAST:event_btnOpenFileActionPerformed
 
@@ -359,10 +392,10 @@ public class frmDangKi extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JTextField txtName;
-    private javax.swing.JTextField txtName1;
-    private javax.swing.JTextField txtName2;
+    private javax.swing.JTextField txtDOB;
+    private javax.swing.JTextField txtDisplayName;
+    private javax.swing.JTextField txtFullName;
     private javax.swing.JPasswordField txtPass;
-    private javax.swing.JPasswordField txtPass1;
+    private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
 }

@@ -120,7 +120,7 @@ public class ChatUI extends javax.swing.JFrame {
 //            }
 //        });
     }
-    
+
     public ChatUI(String currentUser) {
         initComponents();
         try {
@@ -185,6 +185,7 @@ public class ChatUI extends javax.swing.JFrame {
             public void onGroupChatClick(MouseEvent event, ModelMessage message) {
                 System.out.println("Clicked: " + message.getName() + " | " + message.getMessage());
                 currentRoom = message.getName();
+                chatAreaCur.setTitle(currentRoom);
                 loadData();
             }
         });
@@ -195,6 +196,7 @@ public class ChatUI extends javax.swing.JFrame {
                 if (!chatAreaCur.getText().trim().equals("") && !currentRoom.equals("")) {
                     if (currentRoom.equals("GPT")) {
                         System.out.println("Sended");
+                        chatAreaCur.setTitle(currentRoom);
                         chatAreaCur.addChatBox(new ModelMessage(icon, currentUserName, df.format(new Date()), chatAreaCur.getText()), ChatBox.BoxType.RIGHT);
 
                         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -245,7 +247,7 @@ public class ChatUI extends javax.swing.JFrame {
             }
         });
         // Retrieve chat rooms from Firebase database
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<ChatRoom> chatRooms = new ArrayList<>();

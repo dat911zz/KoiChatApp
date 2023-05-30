@@ -85,7 +85,7 @@ public class ChatUI extends javax.swing.JFrame {
     ChatData chatData;
     UserData userData;
     private DatabaseReference ref;
-    private String currentUserName = "chauvanthinh";
+    private String currentUserName = "";
     private String currentRoom = "";
     private boolean isFirstTime = true;
     Icon icon = new ImageIcon(getClass().getClassLoader().getResource("./Imgs/27.png"));
@@ -101,6 +101,33 @@ public class ChatUI extends javax.swing.JFrame {
             URL url;
             url = new URL("https://firebasestorage.googleapis.com/v0/b/chatappjavaswing.appspot.com/o/chatgpt_logo_new.png?alt=media&token=8b6df5a5-04fa-4cc5-856f-c27598fa7647");
             gptIcon = new ImageIcon(ImageIO.read(url));
+        } catch (Exception ex) {
+            System.out.println("Lỗi: " + ex.getMessage());
+        }
+
+        ref = ChatCore.getInstance().getReference("");
+        ChatCore.getInstance().setRef(ref);
+        MessageDAO.getInstance().setRef(ref);
+        ChatRoomDAO.getInstance().setRef(ref);
+//        JOptionPane.showMessageDialog(rootPane, "Đang tải...");
+
+//        loadSideBar();
+        addControl();
+//        SwingUtilities.invokeLater(new Runnable() {
+//            public void run() {
+//                ChatRoomFrm frame = new ChatRoomFrm();
+//                frame.setVisible(true);
+//            }
+//        });
+    }
+    
+    public ChatUI(String currentUser) {
+        initComponents();
+        try {
+            URL url;
+            url = new URL("https://firebasestorage.googleapis.com/v0/b/chatappjavaswing.appspot.com/o/chatgpt_logo_new.png?alt=media&token=8b6df5a5-04fa-4cc5-856f-c27598fa7647");
+            gptIcon = new ImageIcon(ImageIO.read(url));
+            currentUserName = currentUser;
         } catch (Exception ex) {
             System.out.println("Lỗi: " + ex.getMessage());
         }
@@ -158,7 +185,7 @@ public class ChatUI extends javax.swing.JFrame {
             public void onGroupChatClick(MouseEvent event, ModelMessage message) {
                 System.out.println("Clicked: " + message.getName() + " | " + message.getMessage());
                 currentRoom = message.getName();
-                onChangeMessageInCurrentGr();
+                loadData();
             }
         });
         //Send message

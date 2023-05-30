@@ -71,7 +71,7 @@ public class GroupChat extends JComponent {
     }
     
     private void initBox() {
-        setLayout(new MigLayout("", "[][]", "[center]"));
+        setLayout(new MigLayout("", "[][fill]", "[center]"));
         ImageAvatar avatar = new ImageAvatar();
         avatar.setBorderSize(1);
         avatar.setBorderSpace(1);
@@ -86,7 +86,7 @@ public class GroupChat extends JComponent {
         text.setOpaque(false);
         text.setEditable(false);
         add(avatar, "height 40,width 40");
-        add(text, "span");
+        add(text, "span, width 300");
     }
     
     @Override

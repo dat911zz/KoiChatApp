@@ -12,6 +12,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.mycompany.koichatapp.dao.ChatRoomDAO;
 import com.mycompany.koichatapp.dao.MessageDAO;
+import com.mycompany.koichatapp.model.ChatRoom;
 import com.mycompany.koichatapp.model.Message;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -72,6 +73,21 @@ public class ChatCore {
     public int sendMessage(String chatRoomId, String id, Message message){
         int rs[] = new int[1];
         MessageDAO.getInstance().saveMessage(chatRoomId, message, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError de, DatabaseReference dr) {
+                if (de != null) {
+                    rs[0] = -1;
+                }else{
+                    rs[0] = 1;
+                }
+            }
+        });
+        return rs[0];
+    }
+    
+    public int addGroup(ChatRoom chatRoom){
+        int rs[] = new int[1];
+        ChatRoomDAO.getInstance().saveChatRoom(chatRoom, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError de, DatabaseReference dr) {
                 if (de != null) {

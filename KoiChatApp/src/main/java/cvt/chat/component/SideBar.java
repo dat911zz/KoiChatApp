@@ -194,7 +194,11 @@ public class SideBar extends JPanel{
             event.mousePressedSendButton(evt);
         }
     }
-
+    private void runEventMousePressedAddBtn(ActionEvent evt){
+        for (ChatEvent event : events) {
+            event.mousePressedAddBtn(evt);
+        }
+    }
     private void runEventMousePressedFileButton(ActionEvent evt) {
         for (ChatEvent event : events) {
             event.mousePressedFileButton(evt);
@@ -271,7 +275,7 @@ public class SideBar extends JPanel{
         cmdAddGroup.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                runEventMousePressedSendButton(e);
+                runEventMousePressedAddBtn(e);
             }
         });
         JScrollPane scroll = createScroll();

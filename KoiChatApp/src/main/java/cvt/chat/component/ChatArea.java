@@ -110,20 +110,19 @@ public class ChatArea extends JPanel {
         labelTitle.setFont(labelTitle.getFont().deriveFont(14f));
         labelTitle.setBorder(new EmptyBorder(2, 10, 2, 2));
         labelTitle.setForeground(new Color(240, 240, 240));
-        
-        
-        cmdExit.addMouseListener(new MouseAdapter(){
+
+        cmdExit.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 int choose = JOptionPane.showConfirmDialog(getComponent(WIDTH), "Bạn có chắc chắn thoát?", "Thông báo", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                if(choose == JOptionPane.YES_OPTION) {
+                if (choose == JOptionPane.YES_OPTION) {
                     System.exit(0);
                 }
             }
-            
+
         });
-        
+
         panel.add(labelTitle);
         panel.add(cmdExit);
         return panel;
@@ -224,14 +223,8 @@ public class ChatArea extends JPanel {
         } else {
             body.add(new ChatBox(type, message), "al right,width ::80%");
         }
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                body.revalidate();
-                scrollBody.getVerticalScrollBar().setValue(values);
-                bottom.revalidate();
-            }
-        });
+        scrollBody.getVerticalScrollBar().setValue(values);
+        bottom.revalidate();
         body.repaint();
         body.revalidate();
         scrollBody.revalidate();

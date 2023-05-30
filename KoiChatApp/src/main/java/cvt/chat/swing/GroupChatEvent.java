@@ -15,4 +15,6 @@ import java.awt.event.MouseEvent;
 public interface GroupChatEvent {
 
     public void onGroupChatClick(MouseEvent event, ModelMessage message);
+    public void onSeachBtnClick(MouseEvent event, ModelMessage message);
+    public void onAddGroupBtnClick(MouseEvent event, ModelMessage message);
 }

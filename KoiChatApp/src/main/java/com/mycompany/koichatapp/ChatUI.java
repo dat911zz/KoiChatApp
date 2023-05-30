@@ -199,15 +199,67 @@ public class ChatUI extends javax.swing.JFrame {
                 throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
             }
         });
-        sideBarMain.addChatEvent(new ChatEvent(){
+        sideBarMain.addChatEvent(new ChatEvent() {
             @Override
             public void mousePressedSendButton(ActionEvent evt) {
                 System.out.println("SEARCH");
+                System.out.println(sideBarMain.getText());
+                
+                sideBarMain.clearChatBox();
+                if (currentRoom.equals("GPT")) {
+                    chatAreaCur.clearChatBox();
+                    sideBarMain.addGroupChat(new ModelMessage(
+                            gptIcon,
+                            "GPT",
+                            df.format(new Date()),
+                            "Chat Bot"
+                    ), true);
+                } else {
+                    sideBarMain.addGroupChat(new ModelMessage(
+                            gptIcon,
+                            "GPT",
+                            df.format(new Date()),
+                            "Chat Bot"
+                    ));
+                }
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        LinkedHashMap<String, ChatRoom> sortedMap = sortChatRoom(chatData.getChatrooms());
+                        for (Map.Entry<String, ChatRoom> room : sortedMap.entrySet()) {
+                            String date = df.format(new Date());
+                            if (room.getValue().getRoomname().equals("")) {
+                                for (String userName : room.getValue().getMembers()) {
+                                    if (!userName.equals(currentUserName)) {
+                                        room.getValue().setRoomname(findUserByUserName(userName).getDisplayname());
+                                    }
+                                }
+                            }
+                            //Load chat groups
+                            if (isUserInGr(currentUserName, room.getValue()) && room.getValue().getRoomname().contains(sideBarMain.getText())) {
+                                if (currentRoom.equals(room.getKey())) {
+                                    sideBarMain.addGroupChat(new ModelMessage(
+                                            icon,
+                                            room.getKey(),
+                                            date,
+                                            room.getValue().getRoomname()
+                                    ), true);
+                                } else {
+                                    sideBarMain.addGroupChat(new ModelMessage(
+                                            icon,
+                                            room.getKey(),
+                                            date,
+                                            room.getValue().getRoomname()
+                                    ));
+                                }
+                            }
+                        }
+                    }
+                });
             }
 
             @Override
             public void mousePressedFileButton(ActionEvent evt) {
-                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
             }
 
             @Override
@@ -217,7 +269,6 @@ public class ChatUI extends javax.swing.JFrame {
 
             @Override
             public void keyTyped(KeyEvent evt) {
-                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
             }
         });
         //Send message

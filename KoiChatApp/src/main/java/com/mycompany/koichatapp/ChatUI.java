@@ -264,7 +264,8 @@ public class ChatUI extends javax.swing.JFrame {
 
             @Override
             public void mousePressedAddBtn(ActionEvent evt) {
-                System.out.println("ADD");
+                new frmAddGroup(currentUserName, userData).show();
+                loadData();
             }
 
             @Override

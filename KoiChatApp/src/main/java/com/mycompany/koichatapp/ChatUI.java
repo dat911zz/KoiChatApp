@@ -185,8 +185,39 @@ public class ChatUI extends javax.swing.JFrame {
             public void onGroupChatClick(MouseEvent event, ModelMessage message) {
                 System.out.println("Clicked: " + message.getName() + " | " + message.getMessage());
                 currentRoom = message.getName();
-                chatAreaCur.setTitle(currentRoom);
+                chatAreaCur.setTitle(message.getMessage());
                 loadData();
+            }
+
+            @Override
+            public void onSeachBtnClick(MouseEvent event, ModelMessage message) {
+                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            }
+
+            @Override
+            public void onAddGroupBtnClick(MouseEvent event, ModelMessage message) {
+                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            }
+        });
+        sideBarMain.addChatEvent(new ChatEvent(){
+            @Override
+            public void mousePressedSendButton(ActionEvent evt) {
+                System.out.println("SEARCH");
+            }
+
+            @Override
+            public void mousePressedFileButton(ActionEvent evt) {
+                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            }
+
+            @Override
+            public void mousePressedAddBtn(ActionEvent evt) {
+                System.out.println("ADD");
+            }
+
+            @Override
+            public void keyTyped(KeyEvent evt) {
+                throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
             }
         });
         //Send message
@@ -244,6 +275,10 @@ public class ChatUI extends javax.swing.JFrame {
 
             @Override
             public void keyTyped(KeyEvent evt) {
+            }
+
+            @Override
+            public void mousePressedAddBtn(ActionEvent evt) {
             }
         });
         // Retrieve chat rooms from Firebase database

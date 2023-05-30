@@ -8,6 +8,8 @@ public interface ChatEvent {
     public void mousePressedSendButton(ActionEvent evt);
 
     public void mousePressedFileButton(ActionEvent evt);
+    
+    public void mousePressedAddBtn(ActionEvent evt);
 
     public void keyTyped(KeyEvent evt);
 }

@@ -141,6 +141,7 @@ public class frmAddGroup extends javax.swing.JFrame {
         String[] members = txtMember.getText().split(", ");
         ArrayList<String> mems = new ArrayList<>();
         mems.addAll(Arrays.asList(members));
+        mems.add(user);
         ChatRoom c = new ChatRoom();
         c.setAdmin(user);
         c.setRoomname(txtGroupName.getText());

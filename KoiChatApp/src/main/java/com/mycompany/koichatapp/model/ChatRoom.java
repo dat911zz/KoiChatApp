@@ -16,8 +16,8 @@ import java.util.Map;
 public class ChatRoom {
     private String admin;
     private String avatar;
-    private ArrayList<String> members;
-    private HashMap<String, Message> messages;
+    private ArrayList<String> members = new ArrayList<>();
+    private HashMap<String, Message> messages = new HashMap<>();
     private String roomname;
     private long lastAccess;
 
